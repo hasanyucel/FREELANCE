@@ -8,20 +8,26 @@ products = []
 def createDbAndTables():
     conn = sqlite3.connect('db.sqlite')
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXIST 'SiteMapLinks' ('Url' TEXT NOT NULL,PRIMARY KEY('Url'));")
-    cur.execute("CREATE TABLE IF NOT EXIST 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
-    cur.execute("CREATE TABLE IF NOT EXIST 'Products' ('SKU' TEXT,'Name' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT);")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'SiteMapLinks' ('Url'	TEXT NOT NULL,PRIMARY KEY('Url'));")
+    conn.commit()
+    cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
+    conn.commit()
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT);")
+    conn.commit()
     conn.close()
 
 def getAllLinks():
+    conn = sqlite3.connect('db.sqlite')
+    cur = conn.cursor()
     xml = 'https://www.tilemountain.co.uk/sitemap/sitemap.xml'
     r = requests.get(xml)
     soup = BeautifulSoup(r.text, 'lxml')
     urls = [loc.string for loc in soup.find_all('loc')]
-    with open("links.txt", "a") as fh:
-        for url in urls:
-            if url.startswith("https://www.tilemountain.co.uk/p/"):
-                fh.write(url+"\n")
+    for url in urls:
+        if url.startswith("https://www.tilemountain.co.uk/p/"):
+            cur.execute("INSERT OR REPLACE INTO SiteMapLinks (URL) VALUES (?)",(url,))
+    conn.commit()
+    conn.close()
 
 def product_info(url):
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=10)
@@ -54,8 +60,9 @@ def PoolExecutor(urls):
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
         executor.map(product_info, urls)
 
-#getAllLinks() sitemap.xml deki product linklerini çeker
-urls = []
+createDbAndTables()
+getAllLinks()
+"""urls = []
 f = open("links.txt",'r') 
 for line in f:
     line = line.replace("\n", "")
@@ -66,5 +73,5 @@ t0 = time.time()
 PoolExecutor(urls)
 t1 = time.time()
 print(len(urls),len(products))
-print(f"{t1-t0} seconds.")
+print(f"{t1-t0} seconds.")"""
 #product_info("https://www.tilemountain.co.uk/p/lounge-light-grey-polished-porcelain-885.html")
