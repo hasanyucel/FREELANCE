@@ -12,7 +12,7 @@ def createDbAndTables():
     conn.commit()
     cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
     conn.commit()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT);")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT);")
     conn.commit()
     conn.close()
 
@@ -48,10 +48,17 @@ def product_info(url):
         metarial = metarial[0].text
     else:
         metarial = "-"
+    category = soup.find('div',attrs={"class":"breadcrumbs h5 cl-gray pt40 pb20 hidden-xs breadcrumb"})
+    category = category.findAll('a')
+    categories = []
+    for x in category:
+        categories.append(x.text.strip())
+    categories = '/'.join(categories)
 
-    product = (sku,title,size,metarial,stock,price,url)
+    product = (sku,title,categories,size,metarial,stock,price,url)
     print(product)
     products.append(product)
+    
     time.sleep(0.25)
     
 def PoolExecutor(urls):
@@ -62,7 +69,7 @@ def PoolExecutor(urls):
 
 createDbAndTables()
 getAllLinks()
-"""urls = []
+urls = []
 f = open("links.txt",'r') 
 for line in f:
     line = line.replace("\n", "")
@@ -73,5 +80,5 @@ t0 = time.time()
 PoolExecutor(urls)
 t1 = time.time()
 print(len(urls),len(products))
-print(f"{t1-t0} seconds.")"""
-#product_info("https://www.tilemountain.co.uk/p/lounge-light-grey-polished-porcelain-885.html")
+print(f"{t1-t0} seconds.")
+product_info("https://www.tilemountain.co.uk/p/lounge-light-grey-polished-porcelain-885.html")
