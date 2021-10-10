@@ -1,10 +1,17 @@
-import concurrent.futures
-import requests,time,cloudscraper
+import requests,time,cloudscraper,sqlite3,concurrent.futures
 from bs4 import BeautifulSoup
 from rich import print 
 
 MAX_THREADS = 30
 products = []
+
+def createDbAndTables():
+    conn = sqlite3.connect('db.sqlite')
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE IF NOT EXIST 'SiteMapLinks' ('Url' TEXT NOT NULL,PRIMARY KEY('Url'));")
+    cur.execute("CREATE TABLE IF NOT EXIST 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
+    cur.execute("CREATE TABLE IF NOT EXIST 'Products' ('SKU' TEXT,'Name' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT);")
+    conn.close()
 
 def getAllLinks():
     xml = 'https://www.tilemountain.co.uk/sitemap/sitemap.xml'
