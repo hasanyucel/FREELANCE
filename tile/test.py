@@ -8,15 +8,15 @@ products = []
 def createDbAndTables():
     conn = sqlite3.connect('db.sqlite')
     cur = conn.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'SiteMapLinks' ('Url'	TEXT NOT NULL,PRIMARY KEY('Url'));")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'SiteMapLinks' ('Url' TEXT NOT NULL,PRIMARY KEY('Url'));")
     conn.commit()
     cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
     conn.commit()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT);")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT,PRIMARY KEY('SKU'));")
     conn.commit()
     conn.close()
 
-def getAllLinks():
+def insertAllLinks():
     conn = sqlite3.connect('db.sqlite')
     cur = conn.cursor()
     xml = 'https://www.tilemountain.co.uk/sitemap/sitemap.xml'
@@ -25,7 +25,7 @@ def getAllLinks():
     urls = [loc.string for loc in soup.find_all('loc')]
     for url in urls:
         if url.startswith("https://www.tilemountain.co.uk/p/"):
-            cur.execute("INSERT OR REPLACE INTO SiteMapLinks (URL) VALUES (?)",(url,))
+            cur.execute("INSERT OR IGNORE INTO SiteMapLinks (URL) VALUES (?)",(url,))
     conn.commit()
     conn.close()
 
@@ -54,7 +54,8 @@ def product_info(url):
     for x in category:
         categories.append(x.text.strip())
     categories = '/'.join(categories)
-
+    #Product bilgilerini product tablosuna yaz
+    #Price ve stock bilgilerini pricestock tablosuna yaz.
     product = (sku,title,categories,size,metarial,stock,price,url)
     print(product)
     products.append(product)
@@ -67,18 +68,28 @@ def PoolExecutor(urls):
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
         executor.map(product_info, urls)
 
-createDbAndTables()
-getAllLinks()
-urls = []
+def getSiteMapLinks():
+    conn = sqlite3.connect('db.sqlite')
+    cur = conn.cursor()
+    cur.execute('SELECT Url FROM SiteMapLinks')
+    links = cur.fetchall()
+    links = [f[0] for f in links]
+    conn.close()
+    return links
+
+#createDbAndTables()
+#insertAllLinks()
+urls = getSiteMapLinks()
+
+"""urls = []
 f = open("links.txt",'r') 
 for line in f:
     line = line.replace("\n", "")
     urls.append(line)
-    #product_info(line)
+    #product_info(line)"""
 
-t0 = time.time()
+"""t0 = time.time()
 PoolExecutor(urls)
 t1 = time.time()
 print(len(urls),len(products))
-print(f"{t1-t0} seconds.")
-product_info("https://www.tilemountain.co.uk/p/lounge-light-grey-polished-porcelain-885.html")
+print(f"{t1-t0} seconds.")"""
