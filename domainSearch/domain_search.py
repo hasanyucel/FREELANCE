@@ -5,7 +5,7 @@ load_dotenv()
 
 username = "hasanyucel"
 token = os.getenv('name_api_token')
-db_name = "domains"
+db_name = "db"
 table_name = "fiveletterdomains"
 dom_ext = ".com"
 f_ext = ".txt"
