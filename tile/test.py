@@ -12,7 +12,7 @@ def createDbAndTables():
     conn.commit()
     cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
     conn.commit()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Meas' TEXT,'Finish' TEXT,'Url' TEXT,PRIMARY KEY('SKU'));")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Meas' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT,PRIMARY KEY('SKU'));")
     conn.commit()
     conn.close()
 
@@ -43,11 +43,11 @@ def product_info(url):
         size = None
     stock = soup.find('span',attrs={"class":"sqm"}).text
     price = soup.find('span',attrs={"class":"h2 cl-mine-shaft weight-700"}).text.strip()
-    metarial = soup.select("#viewport > div.product-page-detail > section.container.px15.pt20.pb35.cl-accent.details.product-desc > div > div > div.col-xs-12.col-sm-12.col-md-12.col-lg-6.infoprod-col > div > div.tabs-content-box > div > div > ul > li:nth-child(8) > span.detail")
-    if metarial:
-        metarial = metarial[0].text
+    material = soup.select("#viewport > div.product-page-detail > section.container.px15.pt20.pb35.cl-accent.details.product-desc > div > div > div.col-xs-12.col-sm-12.col-md-12.col-lg-6.infoprod-col > div > div.tabs-content-box > div > div > ul > li:nth-child(8) > span.detail")
+    if material:
+        material = Material[0].text
     else:
-        metarial = "-"
+        material = "-"
     category = soup.find('div',attrs={"class":"breadcrumbs h5 cl-gray pt40 pb20 hidden-xs breadcrumb"})
     category = category.findAll('a')
     categories = []
@@ -56,12 +56,19 @@ def product_info(url):
     categories = '/'.join(categories)
     #Product bilgilerini product tablosuna yaz
     #Price ve stock bilgilerini pricestock tablosuna yaz.
-    product = (sku,title,categories,size,metarial,stock,price,url)
+    product = (sku,title,categories,size,material,stock,price,url)
     print(product)
     products.append(product)
     
     time.sleep(0.25)
     
+def insertProductInfos(sku,name,categories,size,meas,material,finish,url):
+    conn = sqlite3.connect('db.sqlite')
+    cur = conn.cursor()
+    cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,meas,material,finish,url) VALUES (?,?,?,?,?,?,?,?)",(sku,name,categories,size,meas,material,finish,url))
+    conn.commit()
+    conn.close()
+
 def PoolExecutor(urls):
     threads = min(MAX_THREADS, len(urls))
     
@@ -77,10 +84,11 @@ def getSiteMapLinks():
     conn.close()
     return links
 
-#createDbAndTables()
-#insertAllLinks()
-urls = getSiteMapLinks()
+createDbAndTables()
+insertAllLinks()
+#urls = getSiteMapLinks()
 
+insertProductInfos("234", "hasan", "ahmet", "600x600","ad", "porcelain", "cilal2ı", "www.google.com")
 """urls = []
 f = open("links.txt",'r') 
 for line in f:
