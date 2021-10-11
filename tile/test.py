@@ -29,7 +29,8 @@ def insertAllSitemapLinks():
     conn.commit()
     conn.close()
 
-def product_info(url):
+def getProductInfo(url):
+    print(url)
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=10)
     html = scraper.get(url).content
     soup = BeautifulSoup(html, 'lxml')
@@ -53,11 +54,27 @@ def product_info(url):
     if meas == "inc VAT":
         meas = soup.find('label', attrs={"class":"sqm-txt"}).text
         meas = meas.replace("/","").strip()
-    stock = soup.find('span', attrs={"class":"sqm"}).text
-    stock = stock.replace(" in Stock","") 
-    stock = stock.split(" ")
-    price = soup.find('span',attrs={"class":"h2 cl-mine-shaft weight-700"}).text.strip()
+    
+
+    stock = soup.find('span', attrs={"class":"sqm"}).text #STARTSWITH KULLAN
+    if stock == "In Stock":
+        stock = "In Stock"
+    elif stock == "Out Of Stock ":
+        stock = "Out Of Stock"
+    elif stock == "More Stock":
+        stock = "More Stock"
+    else:
+        stock = stock.split(" ")
+        stock = stock[0]
+
+    price = soup.find('span',attrs={"class":"specialprice"})
+    if price is not None:
+        price = price.text.strip()
+    else:
+        price = soup.find('span',attrs={"class":"h2 cl-mine-shaft weight-700"}).text.strip()
     price = price.replace("£","")
+    
+    
     attributes = soup.find('ul',attrs={"class":"attributes productDetails"})
     listAttributes = {}
     for li in attributes.findAll('li'):
@@ -77,10 +94,11 @@ def product_info(url):
         categories.append(x.text.strip())
     categories = '/'.join(categories)
     insertProductInfos(sku,title,categories,size,meas,material,finish,url) 
-    date = datetime.today()
-    insertProductStockPrice(sku, date, stock[0], price)
+    date = datetime.today().strftime("%d/%m/%Y")
+    insertProductStockPrice(sku, date, stock, price)
     time.sleep(0.25)
-    print(sku,title,categories,size,meas,material,finish,url)
+    #print(sku,title,categories,size,meas,material,finish,url)
+    print(sku, date, stock, price)
     
 def insertProductInfos(sku,name,categories,size,meas,material,finish,url):
     conn = sqlite3.connect('db.sqlite')
@@ -100,7 +118,7 @@ def PoolExecutor(urls):
     threads = min(MAX_THREADS, len(urls))
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
-        executor.map(product_info, urls)
+        executor.map(getProductInfo, urls)
 
 def getSitemapLinks():
     conn = sqlite3.connect('db.sqlite')
@@ -116,11 +134,13 @@ t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
-PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
+#PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
+for url in urls:
+    getProductInfo(url)
 t1 = time.time()
 print(f"{t1-t0} seconds.")
 
-#product_info("https://www.tilemountain.co.uk/p/surface-mid-grey-lapatto-wall-and-floor-tile.html")
+#getProductInfo("https://www.tilemountain.co.uk/p/surface-mid-grey-lapatto-wall-and-floor-tile.html")
 #Date parametresini düzelt.
 #Stock değişkenini doğru çek
 #Price bilgisini kontrol et. Sale olabilir!
