@@ -33,35 +33,43 @@ def product_info(url):
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=10)
     html = scraper.get(url).content
     soup = BeautifulSoup(html, 'lxml')
-    sku = soup.find('span',attrs={"class":"sku-value"}).text.strip()
+    sku = soup.find('span',attrs={"class":"sku-value"}).text
+    sku = sku.replace("SKU:","").strip()
     title = soup.find('h1',attrs={"class":"mb20 mt0 cl-mine-shaft product-name"}).text.strip()
     size = soup.find('span',attrs={"class":"size-value"})
     if size is not None:
         size = size.text
+        size = size.replace("Size","")
+        size = size.strip()
     else:
         size = None
     stock = soup.find('span',attrs={"class":"sqm"}).text
+    stock = stock.replace(" in Stock","")
+    stock = stock.split(" ")
     price = soup.find('span',attrs={"class":"h2 cl-mine-shaft weight-700"}).text.strip()
     price = price.replace("£","")
-    material = soup.select("#viewport > div.product-page-detail > section.container.px15.pt20.pb35.cl-accent.details.product-desc > div > div > div.col-xs-12.col-sm-12.col-md-12.col-lg-6.infoprod-col > div > div.tabs-content-box > div > div > ul > li:nth-child(8) > span.detail")
-    if material:
-        material = Material[0].text
+    attributes = soup.find('ul',attrs={"class":"attributes productDetails"})
+    listAttributes = {}
+    for li in attributes.findAll('li'):
+        listAttributes.update({li.span.text.strip(): li.span.find_next('span').text.strip()})
+    if "Material" in listAttributes:
+        material = listAttributes["Material"]
     else:
-        material = "-"
+        material = "No Material Info"
+    if "Finish" in listAttributes:
+        finish = listAttributes["Finish"]
+    else:
+        finish = "No finish Info"
+    meas = stock[1]
     category = soup.find('div',attrs={"class":"breadcrumbs h5 cl-gray pt40 pb20 hidden-xs breadcrumb"})
     category = category.findAll('a')
     categories = []
     for x in category:
         categories.append(x.text.strip())
     categories = '/'.join(categories)
-    """
-    insertProductInfos(sku,title,categories,size,meas,material,finish,url) #meas ile finish bulunacak (meas size ikiye bölünmüş hali)
-    #Price ve stock bilgilerini pricestock tablosuna yaz.
+    insertProductInfos(sku,title,categories,size,meas,material,finish,url) 
     date = datetime.today()
-    insertProductStockPrice(sku, date, stock, price)"""
-    product = (sku,title,categories,size,material,stock,price,url)
-    print(product)
-    
+    insertProductStockPrice(sku, date, stock[0], price)
     time.sleep(0.25)
     
 def insertProductInfos(sku,name,categories,size,meas,material,finish,url):
@@ -98,7 +106,6 @@ t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
-print(urls)
 PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
 t1 = time.time()
 print(len(urls),len(urls))
