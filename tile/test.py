@@ -42,9 +42,19 @@ def product_info(url):
         size = size.replace("Size","")
         size = size.strip()
     else:
-        size = None
-    stock = soup.find('span',attrs={"class":"sqm"}).text
-    stock = stock.replace(" in Stock","")
+        size = "No Size Info"
+    meas = soup.find('span',attrs={"class":"sqm-title-special"})
+    if meas is not None:
+        meas = meas.text
+        meas = meas.replace("/","").strip()
+    else:
+        meas = soup.find('span',attrs={"class":"sqm-title"}).text
+        meas = meas.replace("/","").strip()
+    if meas == "inc VAT":
+        meas = soup.find('label', attrs={"class":"sqm-txt"}).text
+        meas = meas.replace("/","").strip()
+    stock = soup.find('span', attrs={"class":"sqm"}).text
+    stock = stock.replace(" in Stock","") 
     stock = stock.split(" ")
     price = soup.find('span',attrs={"class":"h2 cl-mine-shaft weight-700"}).text.strip()
     price = price.replace("£","")
@@ -60,7 +70,6 @@ def product_info(url):
         finish = listAttributes["Finish"]
     else:
         finish = "No finish Info"
-    meas = stock[1]
     category = soup.find('div',attrs={"class":"breadcrumbs h5 cl-gray pt40 pb20 hidden-xs breadcrumb"})
     category = category.findAll('a')
     categories = []
@@ -71,6 +80,7 @@ def product_info(url):
     date = datetime.today()
     insertProductStockPrice(sku, date, stock[0], price)
     time.sleep(0.25)
+    print(sku,title,categories,size,meas,material,finish,url)
     
 def insertProductInfos(sku,name,categories,size,meas,material,finish,url):
     conn = sqlite3.connect('db.sqlite')
@@ -108,6 +118,9 @@ insertAllSitemapLinks()
 urls = getSitemapLinks()
 PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
 t1 = time.time()
-print(len(urls),len(urls))
 print(f"{t1-t0} seconds.")
 
+#product_info("https://www.tilemountain.co.uk/p/surface-mid-grey-lapatto-wall-and-floor-tile.html")
+#Date parametresini düzelt.
+#Stock değişkenini doğru çek
+#Price bilgisini kontrol et. Sale olabilir!
