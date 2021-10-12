@@ -1,4 +1,4 @@
-import requests,time,cloudscraper,sqlite3,concurrent.futures
+import requests,time,cloudscraper,sqlite3,concurrent.futures,pandas as pd
 from datetime import datetime
 from bs4 import BeautifulSoup
 from rich import print 
@@ -30,7 +30,6 @@ def insertAllSitemapLinks():
     conn.close()
 
 def getProductInfo(url):
-    print(url)
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=10)
     html = scraper.get(url).content
     soup = BeautifulSoup(html, 'lxml')
@@ -54,27 +53,18 @@ def getProductInfo(url):
     if meas == "inc VAT":
         meas = soup.find('label', attrs={"class":"sqm-txt"}).text
         meas = meas.replace("/","").strip()
-    
-
-    stock = soup.find('span', attrs={"class":"sqm"}).text #STARTSWITH KULLAN
-    if stock == "In Stock":
-        stock = "In Stock"
-    elif stock == "Out Of Stock ":
-        stock = "Out Of Stock"
-    elif stock == "More Stock":
-        stock = "More Stock"
+    stock = soup.find('span', attrs={"class":"sqm"}).text 
+    if stock.startswith("In") or stock.startswith("Out") or stock.startswith("More"):
+        stock = stock + ""
     else:
         stock = stock.split(" ")
         stock = stock[0]
-
     price = soup.find('span',attrs={"class":"specialprice"})
     if price is not None:
         price = price.text.strip()
     else:
         price = soup.find('span',attrs={"class":"h2 cl-mine-shaft weight-700"}).text.strip()
     price = price.replace("£","")
-    
-    
     attributes = soup.find('ul',attrs={"class":"attributes productDetails"})
     listAttributes = {}
     for li in attributes.findAll('li'):
@@ -97,8 +87,7 @@ def getProductInfo(url):
     date = datetime.today().strftime("%d/%m/%Y")
     insertProductStockPrice(sku, date, stock, price)
     time.sleep(0.25)
-    #print(sku,title,categories,size,meas,material,finish,url)
-    print(sku, date, stock, price)
+    print(sku,title,categories,size,meas,material,finish,stock,price,url)
     
 def insertProductInfos(sku,name,categories,size,meas,material,finish,url):
     conn = sqlite3.connect('db.sqlite')
@@ -129,18 +118,20 @@ def getSitemapLinks():
     conn.close()
     return links
 
+def getPivotStockPrice():
+    conn = sqlite3.connect('db.sqlite')
+    df = pd.read_sql_query("SELECT * FROM StockPrice group by sku,date,stock,price", conn)
+    df = df.pivot(index ='SKU', columns ='Date', values =['Stock','Price'])
+    
+    print(df)
+    conn.close()
 
-t0 = time.time()
+getPivotStockPrice()
+"""t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
-#PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
-for url in urls:
-    getProductInfo(url)
+PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
 t1 = time.time()
-print(f"{t1-t0} seconds.")
-
-#getProductInfo("https://www.tilemountain.co.uk/p/surface-mid-grey-lapatto-wall-and-floor-tile.html")
-#Date parametresini düzelt.
-#Stock değişkenini doğru çek
-#Price bilgisini kontrol et. Sale olabilir!
+print(f"{t1-t0} seconds.")"""
+#Df to excel 
