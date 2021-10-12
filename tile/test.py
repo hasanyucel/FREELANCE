@@ -121,17 +121,23 @@ def getSitemapLinks():
 def getPivotStockPrice():
     conn = sqlite3.connect('db.sqlite')
     df = pd.read_sql_query("SELECT * FROM StockPrice group by sku,date,stock,price", conn)
-    df = df.pivot(index ='SKU', columns ='Date', values =['Stock','Price'])
-    
+    df = df.pivot_table(index ='SKU', columns ='Date', values =['Price','Stock'],aggfunc='first')
+    #df1 = df.swaplevel(0,1, axis=1).sort_index(axis=1)
+    #print(df1)
+    df.columns = df.columns.swaplevel(0, 1)
+    df.sort_index(axis=1, level=0, inplace=True)
     print(df)
+    df.to_excel("output.xlsx")  
     conn.close()
+    
 
-getPivotStockPrice()
-"""t0 = time.time()
+
+t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
 PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
 t1 = time.time()
-print(f"{t1-t0} seconds.")"""
+print(f"{t1-t0} seconds.")
 #Df to excel 
+getPivotStockPrice()
