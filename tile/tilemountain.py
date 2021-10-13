@@ -4,9 +4,10 @@ from bs4 import BeautifulSoup
 from rich import print 
 
 MAX_THREADS = 30
+db = "tilemountain.sqlite"
 
 def createDbAndTables():
-    conn = sqlite3.connect('db.sqlite')
+    conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS 'SiteMapLinks' ('Url' TEXT NOT NULL,PRIMARY KEY('Url'));")
     conn.commit()
@@ -17,7 +18,7 @@ def createDbAndTables():
     conn.close()
 
 def insertAllSitemapLinks():
-    conn = sqlite3.connect('db.sqlite')
+    conn = sqlite3.connect(db)
     cur = conn.cursor()
     xml = 'https://www.tilemountain.co.uk/sitemap/sitemap.xml'
     r = requests.get(xml)
@@ -90,14 +91,14 @@ def getProductInfo(url):
     print(sku,title,categories,size,meas,material,finish,stock,price,url)
     
 def insertProductInfos(sku,name,categories,size,meas,material,finish,url):
-    conn = sqlite3.connect('db.sqlite')
+    conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,meas,material,finish,url) VALUES (?,?,?,?,?,?,?,?)",(sku,name,categories,size,meas,material,finish,url))
     conn.commit()
     conn.close()
 
 def insertProductStockPrice(sku,date,stock,price):
-    conn = sqlite3.connect('db.sqlite')
+    conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute("INSERT INTO StockPrice (sku,date,stock,price) VALUES (?,?,?,?)",(sku,date,stock,price))
     conn.commit()
@@ -110,7 +111,7 @@ def PoolExecutor(urls):
         executor.map(getProductInfo, urls)
 
 def getSitemapLinks():
-    conn = sqlite3.connect('db.sqlite')
+    conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute('SELECT Url FROM SiteMapLinks')
     links = cur.fetchall()
@@ -119,7 +120,7 @@ def getSitemapLinks():
     return links
 
 def getPivotStockPrice():
-    conn = sqlite3.connect('db.sqlite')
+    conn = sqlite3.connect(db)
     df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.meas,p.material,p.finish,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
     df1 = df.pivot_table(index =['Url','SKU','Name','Size','Meas','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
     df2 = df.pivot_table(index =['Url','SKU','Name','Size','Meas','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
@@ -127,7 +128,7 @@ def getPivotStockPrice():
     #df.columns = df.columns.swaplevel(0, 1)
     #df.sort_index(axis=1, level=0, inplace=True)
     #print(df)
-    writer = pd.ExcelWriter('output.xlsx')
+    writer = pd.ExcelWriter('tilemountain.xlsx')
     df1.to_excel(writer,sheet_name ='Price')  
     df2.to_excel(writer,sheet_name ='Stock')  
     writer.save()
@@ -135,13 +136,15 @@ def getPivotStockPrice():
 
 licence = datetime.today().strftime("%d/%m/%Y")
 print(licence) 
-if(licence < '13/10/2021'):
+if(licence < '23/10/2021'):
     print("Script is working...")
     t0 = time.time()
-    """createDbAndTables()
+    createDbAndTables()
     insertAllSitemapLinks()
     urls = getSitemapLinks()
-    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+    for url in urls:
+        getProductInfo(url)
+    #PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
     getPivotStockPrice()
     t1 = time.time()
     print(f"{t1-t0} seconds.")
