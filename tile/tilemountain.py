@@ -132,12 +132,18 @@ def getPivotStockPrice():
     df2.to_excel(writer,sheet_name ='Stock')  
     writer.save()
     conn.close()
-    
-t0 = time.time()
-createDbAndTables()
-insertAllSitemapLinks()
-urls = getSitemapLinks()
-PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
-getPivotStockPrice()
-t1 = time.time()
-print(f"{t1-t0} seconds.")
+
+licence = datetime.today().strftime("%d/%m/%Y")
+print(licence) 
+if(licence < '13/10/2021'):
+    print("Script is working...")
+    t0 = time.time()
+    """createDbAndTables()
+    insertAllSitemapLinks()
+    urls = getSitemapLinks()
+    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+    getPivotStockPrice()
+    t1 = time.time()
+    print(f"{t1-t0} seconds.")
+else:
+    print("Trial time has been finished.")
