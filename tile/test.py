@@ -121,19 +121,23 @@ def getSitemapLinks():
 def getPivotStockPrice():
     conn = sqlite3.connect('db.sqlite')
     df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.meas,p.material,p.finish,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
-    df = df.pivot_table(index =['Url','SKU','Name','Size','Meas','Material','Finish'], columns ='Date', values =['Price','Stock'],aggfunc='first')
+    df1 = df.pivot_table(index =['Url','SKU','Name','Size','Meas','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
+    df2 = df.pivot_table(index =['Url','SKU','Name','Size','Meas','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
     #df1 = df.swaplevel(0,1, axis=1).sort_index(axis=1)
-    df.columns = df.columns.swaplevel(0, 1)
-    df.sort_index(axis=1, level=0, inplace=True)
+    #df.columns = df.columns.swaplevel(0, 1)
+    #df.sort_index(axis=1, level=0, inplace=True)
     #print(df)
-    df.to_excel("output.xlsx")  
+    writer = pd.ExcelWriter('output.xlsx')
+    df1.to_excel(writer,sheet_name ='Price')  
+    df2.to_excel(writer,sheet_name ='Stock')  
+    writer.save()
     conn.close()
     
 t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
-PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et.
+PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
 getPivotStockPrice()
 t1 = time.time()
 print(f"{t1-t0} seconds.")
