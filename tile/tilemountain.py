@@ -142,9 +142,9 @@ if(licence < '23/10/2021'):
     createDbAndTables()
     insertAllSitemapLinks()
     urls = getSitemapLinks()
-    for url in urls:
-        getProductInfo(url)
-    #PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+    """for url in urls:
+        getProductInfo(url)"""
+    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
     getPivotStockPrice()
     t1 = time.time()
     print(f"{t1-t0} seconds.")
