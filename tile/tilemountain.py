@@ -134,9 +134,21 @@ def getPivotStockPrice():
     writer.save()
     conn.close()
 
-licence = datetime.today().strftime("%d/%m/%Y")
-print(licence) 
-if(licence < '23/10/2021'):
+def getLicenceDate():
+    licence_key = ""
+    link = "https://drive.google.com/file/d/1bZ87-1f2WRU5i0etRLAYRIbaPXax1dz4/view?usp=sharing"
+    with open('licence.txt') as f:
+        licence_key = f.readline().strip()
+    file_id=link.split('/')[-2]
+    dwn_url='https://drive.google.com/uc?id=' + file_id
+    df = pd.read_csv(dwn_url)
+    row = df.query('account == "tilemountain" & key == "'+licence_key+'"')
+    tarih = row["tarih"].values[0]
+    return tarih
+
+today = datetime.today().strftime("%d/%m/%Y")
+licence = getLicenceDate()
+if(today < licence):
     print("Script is working...")
     t0 = time.time()
     createDbAndTables()
