@@ -119,6 +119,10 @@ def getSitemapLinks():
     conn.close()
     return links
 
+def make_hyperlink(value):
+    url = "https://custom.url/{}"
+    return '=HYPERLINK("%s", "%s")' % (url.format(value), value)
+
 def getPivotStockPrice():
     conn = sqlite3.connect(db)
     df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
@@ -128,11 +132,13 @@ def getPivotStockPrice():
     #df.columns = df.columns.swaplevel(0, 1)
     #df.sort_index(axis=1, level=0, inplace=True)
     #print(df)
+    df['hyperlink'] = df['Year'].apply(lambda x: make_hyperlink(x))#Düzeltilecek.
     writer = pd.ExcelWriter('tilemountain.xlsx')
     df1.to_excel(writer,sheet_name ='Price')  
     df2.to_excel(writer,sheet_name ='Stock')  
     writer.save()
     conn.close()
+
 
 def getLicenceDate():
     licence_key = ""
