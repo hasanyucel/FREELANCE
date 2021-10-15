@@ -13,7 +13,7 @@ def createDbAndTables():
     conn.commit()
     cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
     conn.commit()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Meas' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT,PRIMARY KEY('SKU'));")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Unit' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT,PRIMARY KEY('SKU'));")
     conn.commit()
     conn.close()
 
@@ -44,16 +44,16 @@ def getProductInfo(url):
         size = size.strip()
     else:
         size = "No Size Info"
-    meas = soup.find('span',attrs={"class":"sqm-title-special"})
-    if meas is not None:
-        meas = meas.text
-        meas = meas.replace("/","").strip()
+    unit = soup.find('span',attrs={"class":"sqm-title-special"})
+    if unit is not None:
+        unit = unit.text
+        unit = unit.replace("/","").strip()
     else:
-        meas = soup.find('span',attrs={"class":"sqm-title"}).text
-        meas = meas.replace("/","").strip()
-    if meas == "inc VAT":
-        meas = soup.find('label', attrs={"class":"sqm-txt"}).text
-        meas = meas.replace("/","").strip()
+        unit = soup.find('span',attrs={"class":"sqm-title"}).text
+        unit = unit.replace("/","").strip()
+    if unit == "inc VAT":
+        unit = soup.find('label', attrs={"class":"sqm-txt"}).text
+        unit = unit.replace("/","").strip()
     stock = soup.find('span', attrs={"class":"sqm"}).text 
     if stock.startswith("In") or stock.startswith("Out") or stock.startswith("More"):
         stock = stock + ""
@@ -73,27 +73,27 @@ def getProductInfo(url):
     if "Material" in listAttributes:
         material = listAttributes["Material"]
     else:
-        material = "No Material Info"
+        material = "-"
     if "Finish" in listAttributes:
         finish = listAttributes["Finish"]
     else:
-        finish = "No finish Info"
+        finish = "-"
     category = soup.find('div',attrs={"class":"breadcrumbs h5 cl-gray pt40 pb20 hidden-xs breadcrumb"})
     category = category.findAll('a')
     categories = []
     for x in category:
         categories.append(x.text.strip())
     categories = '/'.join(categories)
-    insertProductInfos(sku,title,categories,size,meas,material,finish,url) 
+    insertProductInfos(sku,title,categories,size,unit,material,finish,url) 
     date = datetime.today().strftime("%d/%m/%Y")
     insertProductStockPrice(sku, date, stock, price)
     time.sleep(0.25)
-    print(sku,title,categories,size,meas,material,finish,stock,price,url)
+    print(sku,title,categories,size,unit,material,finish,stock,price,url)
     
-def insertProductInfos(sku,name,categories,size,meas,material,finish,url):
+def insertProductInfos(sku,name,categories,size,unit,material,finish,url):
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,meas,material,finish,url) VALUES (?,?,?,?,?,?,?,?)",(sku,name,categories,size,meas,material,finish,url))
+    cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,unit,material,finish,url) VALUES (?,?,?,?,?,?,?,?)",(sku,name,categories,size,unit,material,finish,url))
     conn.commit()
     conn.close()
 
@@ -121,9 +121,9 @@ def getSitemapLinks():
 
 def getPivotStockPrice():
     conn = sqlite3.connect(db)
-    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.meas,p.material,p.finish,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
-    df1 = df.pivot_table(index =['Url','SKU','Name','Size','Meas','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
-    df2 = df.pivot_table(index =['Url','SKU','Name','Size','Meas','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
+    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
+    df1 = df.pivot_table(index =['Url','SKU','Name','Size','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
+    df2 = df.pivot_table(index =['Url','SKU','Name','Size','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
     #df1 = df.swaplevel(0,1, axis=1).sort_index(axis=1)
     #df.columns = df.columns.swaplevel(0, 1)
     #df.sort_index(axis=1, level=0, inplace=True)
