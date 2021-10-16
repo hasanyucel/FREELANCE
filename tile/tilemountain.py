@@ -11,9 +11,9 @@ def createDbAndTables():
     cur = conn.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS 'SiteMapLinks' ('Url' TEXT NOT NULL,PRIMARY KEY('Url'));")
     conn.commit()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock' REAL NOT NULL,'Price' REAL NOT NULL,PRIMARY KEY('SKU','Date'));")
     conn.commit()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Unit' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT,PRIMARY KEY('SKU'));")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Unit' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT, 'CurrentPrice' REAL,PRIMARY KEY('SKU'));")
     conn.commit()
     conn.close()
 
@@ -43,7 +43,7 @@ def getProductInfo(url):
         size = size.replace("Size","")
         size = size.strip()
     else:
-        size = "No Size Info"
+        size = "-"
     unit = soup.find('span',attrs={"class":"sqm-title-special"})
     if unit is not None:
         unit = unit.text
@@ -84,23 +84,23 @@ def getProductInfo(url):
     for x in category:
         categories.append(x.text.strip())
     categories = '/'.join(categories)
-    insertProductInfos(sku,title,categories,size,unit,material,finish,url) 
+    insertProductInfos(sku,title,categories,size,unit,material,finish,url,price) 
     date = datetime.today().strftime("%d/%m/%Y")
     insertProductStockPrice(sku, date, stock, price)
     time.sleep(0.25)
     print(sku,title,categories,size,unit,material,finish,stock,price,url)
     
-def insertProductInfos(sku,name,categories,size,unit,material,finish,url):
+def insertProductInfos(sku,name,categories,size,unit,material,finish,url,currentprice):
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,unit,material,finish,url) VALUES (?,?,?,?,?,?,?,?)",(sku,name,categories,size,unit,material,finish,url))
+    cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,unit,material,finish,url,currentprice) VALUES (?,?,?,?,?,?,?,?,?)",(sku,name,categories,size,unit,material,finish,url,currentprice))
     conn.commit()
     conn.close()
 
 def insertProductStockPrice(sku,date,stock,price):
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    cur.execute("INSERT INTO StockPrice (sku,date,stock,price) VALUES (?,?,?,?)",(sku,date,stock,price))
+    cur.execute("INSERT OR REPLACE INTO StockPrice (sku,date,stock,price) VALUES (?,?,?,?)",(sku,date,stock,price))
     conn.commit()
     conn.close()
 
@@ -119,20 +119,20 @@ def getSitemapLinks():
     conn.close()
     return links
 
-def make_hyperlink(value):
-    url = "https://custom.url/{}"
-    return '=HYPERLINK("%s", "%s")' % (url.format(value), value)
+def makeHyperlink(url):
+    return f'=Hyperlink("{url}","Product")'
 
 def getPivotStockPrice():
     conn = sqlite3.connect(db)
-    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
-    df1 = df.pivot_table(index =['Url','SKU','Name','Size','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
-    df2 = df.pivot_table(index =['Url','SKU','Name','Size','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
+    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,p.currentprice,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
+    df = pd.DataFrame(df)
+    df['Url'] = df.apply(lambda row : makeHyperlink(row['Url']), axis = 1)
+    df1 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','Size','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
+    df2 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','Size','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
     #df1 = df.swaplevel(0,1, axis=1).sort_index(axis=1)
     #df.columns = df.columns.swaplevel(0, 1)
     #df.sort_index(axis=1, level=0, inplace=True)
     #print(df)
-    df['hyperlink'] = df['Year'].apply(lambda x: make_hyperlink(x))#Düzeltilecek.
     writer = pd.ExcelWriter('tilemountain.xlsx')
     df1.to_excel(writer,sheet_name ='Price')  
     df2.to_excel(writer,sheet_name ='Stock')  
@@ -157,11 +157,11 @@ licence = getLicenceDate()
 if(today < licence):
     print("Script is working...")
     t0 = time.time()
-    createDbAndTables()
+    """createDbAndTables()
     insertAllSitemapLinks()
     urls = getSitemapLinks()
-    """for url in urls:
-        getProductInfo(url)"""
+    for url in urls:
+        getProductInfo(url)#
     PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
     getPivotStockPrice()
     t1 = time.time()
