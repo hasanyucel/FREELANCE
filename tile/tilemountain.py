@@ -139,7 +139,6 @@ def getPivotStockPrice():
     writer.save()
     conn.close()
 
-
 def getLicenceDate():
     licence_key = ""
     link = "https://drive.google.com/file/d/1bZ87-1f2WRU5i0etRLAYRIbaPXax1dz4/view?usp=sharing"
@@ -152,6 +151,30 @@ def getLicenceDate():
     tarih = row["tarih"].values[0]
     return tarih
 
+def calculateEstimatedSales():
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute('SELECT distinct sku FROM Products')
+    products = cur.fetchall()
+    for row in products:
+        sku = row[0]
+        cur.execute(f'SELECT * FROM (SELECT stock FROM StockPrice where sku="{sku}" order by date desc) LIMIT 2')
+        first_row = next(cur,[0])[0]
+        second_row = next(cur,[0])[0]
+        try:
+            first_row = float(first_row)
+        except ValueError:
+            first_row = 0
+        try:
+            second_row = float(second_row)
+        except ValueError:
+            second_row = 0
+        dif = first_row - second_row # - + değişimi için yerini değiştir.
+        print(sku,first_row,second_row,dif) #farkı updateEstimatedSales fonksiyonuna gönder sql tablolarını güncelle         
+    conn.close()
+
+#def updateEstimatedSales(): fonksiyonunu yaz
+
 today = datetime.today().strftime("%d/%m/%Y")
 licence = getLicenceDate()
 if(today < licence):
@@ -163,7 +186,8 @@ if(today < licence):
     for url in urls:
         getProductInfo(url)#
     PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
-    getPivotStockPrice()
+    calculateEstimatedSales()
+    #getPivotStockPrice()
     t1 = time.time()
     print(f"{t1-t0} seconds.")
 else:
