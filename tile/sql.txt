@@ -2,4 +2,4 @@ CREATE TABLE IF NOT EXISTS 'SiteMapLinks' ('Url'	TEXT NOT NULL,PRIMARY KEY('Url'
 
 CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock'	REAL NOT NULL,'Price' REAL NOT NULL);
 
-CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Meas' TEXT,'Metarial' TEXT,'Finish' TEXT,'Url' TEXT,PRIMARY KEY('SKU'));
+CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Unit' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT, 'CurrentPrice' REAL,'EstimatedSales' REAL,PRIMARY KEY('SKU'));

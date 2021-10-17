@@ -13,7 +13,7 @@ def createDbAndTables():
     conn.commit()
     cur.execute("CREATE TABLE IF NOT EXISTS 'StockPrice' ('SKU' TEXT NOT NULL,'Date' DATE NOT NULL,'Stock' REAL NOT NULL,'Price' REAL NOT NULL,PRIMARY KEY('SKU','Date'));")
     conn.commit()
-    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Unit' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT, 'CurrentPrice' REAL,PRIMARY KEY('SKU'));")
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Products' ('SKU' TEXT,'Name' TEXT,'Categories' TEXT,'Size' REAL,'Unit' TEXT,'Material' TEXT,'Finish' TEXT,'Url' TEXT, 'CurrentPrice' REAL,'EstimatedSales' REAL,PRIMARY KEY('SKU'));")
     conn.commit()
     conn.close()
 
@@ -124,11 +124,11 @@ def makeHyperlink(url):
 
 def getPivotStockPrice():
     conn = sqlite3.connect(db)
-    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,p.currentprice,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
+    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,p.currentprice,p.estimatedsales,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
     df = pd.DataFrame(df)
     df['Url'] = df.apply(lambda row : makeHyperlink(row['Url']), axis = 1)
-    df1 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','Size','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
-    df2 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','Size','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
+    df1 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','EstimatedSales','Size','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
+    df2 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','EstimatedSales','Size','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
     #df1 = df.swaplevel(0,1, axis=1).sort_index(axis=1)
     #df.columns = df.columns.swaplevel(0, 1)
     #df.sort_index(axis=1, level=0, inplace=True)
@@ -170,24 +170,30 @@ def calculateEstimatedSales():
         except ValueError:
             second_row = 0
         dif = first_row - second_row # - + değişimi için yerini değiştir.
-        print(sku,first_row,second_row,dif) #farkı updateEstimatedSales fonksiyonuna gönder sql tablolarını güncelle         
+        updateEstimatedSales(sku,dif)
+        #print(sku,first_row,second_row,dif) #farkı updateEstimatedSales fonksiyonuna gönder sql tablolarını güncelle         
     conn.close()
 
-#def updateEstimatedSales(): fonksiyonunu yaz
+def updateEstimatedSales(sku,dif):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute(f'UPDATE Products SET EstimatedSales = "{dif}" WHERE sku = "{sku}";')
+    conn.commit()
+    conn.close()
 
 today = datetime.today().strftime("%d/%m/%Y")
 licence = getLicenceDate()
 if(today < licence):
     print("Script is working...")
     t0 = time.time()
-    """createDbAndTables()
+    createDbAndTables()
     insertAllSitemapLinks()
     urls = getSitemapLinks()
-    for url in urls:
-        getProductInfo(url)#
+    """for url in urls:
+        getProductInfo(url)#"""
     PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
     calculateEstimatedSales()
-    #getPivotStockPrice()
+    getPivotStockPrice()
     t1 = time.time()
     print(f"{t1-t0} seconds.")
 else:
