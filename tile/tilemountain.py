@@ -87,7 +87,7 @@ def getProductInfo(url):
     insertProductInfos(sku,title,categories,size,unit,material,finish,url,price) 
     date = datetime.today().strftime("%d/%m/%Y")
     insertProductStockPrice(sku, date, stock, price)
-    time.sleep(0.25)
+    time.sleep(0.7)
     print(sku,title,categories,size,unit,material,finish,stock,price,url)
     
 def insertProductInfos(sku,name,categories,size,unit,material,finish,url,currentprice):
@@ -129,10 +129,8 @@ def getPivotStockPrice():
     df['Url'] = df.apply(lambda row : makeHyperlink(row['Url']), axis = 1)
     df1 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','EstimatedSales','Size','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
     df2 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','EstimatedSales','Size','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
-    #df1 = df.swaplevel(0,1, axis=1).sort_index(axis=1)
-    #df.columns = df.columns.swaplevel(0, 1)
-    #df.sort_index(axis=1, level=0, inplace=True)
-    #print(df)
+    df1 = df1.sort_values("EstimatedSales")
+    df2 = df2.sort_values("EstimatedSales")
     writer = pd.ExcelWriter('tilemountain.xlsx')
     df1.to_excel(writer,sheet_name ='Price')  
     df2.to_excel(writer,sheet_name ='Stock')  
@@ -156,6 +154,7 @@ def calculateEstimatedSales():
     cur = conn.cursor()
     cur.execute('SELECT distinct sku FROM Products')
     products = cur.fetchall()
+    print("Estimated Sales is calculating...")
     for row in products:
         sku = row[0]
         cur.execute(f'SELECT * FROM (SELECT stock FROM StockPrice where sku="{sku}" order by date desc) LIMIT 2')
@@ -170,8 +169,7 @@ def calculateEstimatedSales():
         except ValueError:
             second_row = 0
         dif = first_row - second_row # - + değişimi için yerini değiştir.
-        updateEstimatedSales(sku,dif)
-        #print(sku,first_row,second_row,dif) #farkı updateEstimatedSales fonksiyonuna gönder sql tablolarını güncelle         
+        updateEstimatedSales(sku,dif)   
     conn.close()
 
 def updateEstimatedSales(sku,dif):
@@ -186,14 +184,15 @@ licence = getLicenceDate()
 if(today < licence):
     print("Script is working...")
     t0 = time.time()
-    createDbAndTables()
+    """createDbAndTables()
     insertAllSitemapLinks()
     urls = getSitemapLinks()
-    """for url in urls:
-        getProductInfo(url)#"""
-    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
-    calculateEstimatedSales()
+    for url in urls:
+        getProductInfo(url)"""
+    """PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+    """calculateEstimatedSales()"""
     getPivotStockPrice()
+    #getProductInfo("https://www.tilemountain.co.uk/p/keraquick-grey-fast-setting-adhesive-20kg.html")
     t1 = time.time()
     print(f"{t1-t0} seconds.")
 else:
