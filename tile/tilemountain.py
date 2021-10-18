@@ -87,7 +87,7 @@ def getProductInfo(url):
     insertProductInfos(sku,title,categories,size,unit,material,finish,url,price) 
     date = datetime.today().strftime("%d/%m/%Y")
     insertProductStockPrice(sku, date, stock, price)
-    time.sleep(0.7)
+    time.sleep(1)
     print(sku,title,categories,size,unit,material,finish,stock,price,url)
     
 def insertProductInfos(sku,name,categories,size,unit,material,finish,url,currentprice):
@@ -169,7 +169,10 @@ def calculateEstimatedSales():
         except ValueError:
             second_row = 0
         dif = first_row - second_row # - + değişimi için yerini değiştir.
-        updateEstimatedSales(sku,dif)   
+        if dif <= 0:
+            updateEstimatedSales(sku,dif)
+        else:
+            updateEstimatedSales(sku, 0)   
     conn.close()
 
 def updateEstimatedSales(sku,dif):
@@ -184,15 +187,14 @@ licence = getLicenceDate()
 if(today < licence):
     print("Script is working...")
     t0 = time.time()
-    """createDbAndTables()
+    createDbAndTables()
     insertAllSitemapLinks()
     urls = getSitemapLinks()
-    for url in urls:
+    """for url in urls:
         getProductInfo(url)"""
-    """PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
-    """calculateEstimatedSales()"""
+    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+    calculateEstimatedSales()
     getPivotStockPrice()
-    #getProductInfo("https://www.tilemountain.co.uk/p/keraquick-grey-fast-setting-adhesive-20kg.html")
     t1 = time.time()
     print(f"{t1-t0} seconds.")
 else:
