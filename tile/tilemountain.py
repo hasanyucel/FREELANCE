@@ -157,7 +157,7 @@ def calculateEstimatedSales():
     print("Estimated Sales is calculating...")
     for row in products:
         sku = row[0]
-        cur.execute(f'SELECT * FROM (SELECT stock FROM StockPrice where sku="{sku}" order by date desc) LIMIT 2')
+        """cur.execute(f'SELECT * FROM (SELECT stock FROM StockPrice where sku="{sku}" order by date desc) LIMIT 2')
         first_row = next(cur,[0])[0]
         second_row = next(cur,[0])[0]
         try:
@@ -168,7 +168,11 @@ def calculateEstimatedSales():
             second_row = float(second_row)
         except ValueError:
             second_row = 0
-        dif = first_row - second_row # - + değişimi için yerini değiştir.
+        dif = first_row - second_row # - + değişimi için yerini değiştir."""
+        cur.execute(f'select sum(Difference)from (SELECT stock - LAG(stock) OVER (ORDER BY Date) AS Difference FROM StockPrice where sku="{sku}")')
+        dif = cur.fetchone()
+        dif = dif[0]
+        print(dif)
         if dif <= 0:
             updateEstimatedSales(sku,dif)
         else:
@@ -187,12 +191,12 @@ licence = getLicenceDate()
 if(today < licence):
     print("Script is working...")
     t0 = time.time()
-    createDbAndTables()
+    """createDbAndTables()
     insertAllSitemapLinks()
-    urls = getSitemapLinks()
+    urls = getSitemapLinks()"""
     """for url in urls:
         getProductInfo(url)"""
-    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+    """PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
     calculateEstimatedSales()
     getPivotStockPrice()
     t1 = time.time()
