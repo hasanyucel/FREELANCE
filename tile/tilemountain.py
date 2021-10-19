@@ -160,6 +160,8 @@ def calculateEstimatedSales():
         cur.execute(f'select sum(Difference)from (SELECT stock - LAG(stock) OVER (ORDER BY Date) AS Difference FROM StockPrice where sku="{sku}")')
         dif = cur.fetchone()
         dif = dif[0]
+        if dif is None:
+            dif = 0
         if dif <= 0:
             updateEstimatedSales(sku,dif)
         else:
@@ -190,3 +192,10 @@ if(today < licence):
     print(f"{t1-t0} seconds.")
 else:
     print("Trial time has been finished.")
+
+import sys
+def check_quit(inp):
+    if inp == 'q':
+        sys.exit(0)
+x = str(input("Please press 'q' to exit: "))
+check_quit(x)
