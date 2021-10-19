@@ -127,8 +127,8 @@ def getPivotStockPrice():
     df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,p.currentprice,p.estimatedsales,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
     df = pd.DataFrame(df)
     df['Url'] = df.apply(lambda row : makeHyperlink(row['Url']), axis = 1)
-    df1 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','EstimatedSales','Size','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
-    df2 = df.pivot_table(index =['Url','SKU','Name','CurrentPrice','EstimatedSales','Size','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
+    df1 = df.pivot_table(index =['Url','SKU','Name','Size','CurrentPrice','EstimatedSales','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
+    df2 = df.pivot_table(index =['Url','SKU','Name','Size','CurrentPrice','EstimatedSales','Unit','Material','Finish'], columns ='Date', values ='Stock',aggfunc='first')
     df1 = df1.sort_values("EstimatedSales")
     df2 = df2.sort_values("EstimatedSales")
     writer = pd.ExcelWriter('tilemountain.xlsx')
@@ -138,10 +138,10 @@ def getPivotStockPrice():
     conn.close()
 
 def getLicenceDate():
-    licence_key = ""
+    licence_key = "YPNPN5QBXUON"
     link = "https://drive.google.com/file/d/1bZ87-1f2WRU5i0etRLAYRIbaPXax1dz4/view?usp=sharing"
-    with open('licence.txt') as f:
-        licence_key = f.readline().strip()
+    """with open('licence.txt') as f:
+        licence_key = f.readline().strip()"""
     file_id=link.split('/')[-2]
     dwn_url='https://drive.google.com/uc?id=' + file_id
     df = pd.read_csv(dwn_url)
@@ -157,22 +157,9 @@ def calculateEstimatedSales():
     print("Estimated Sales is calculating...")
     for row in products:
         sku = row[0]
-        """cur.execute(f'SELECT * FROM (SELECT stock FROM StockPrice where sku="{sku}" order by date desc) LIMIT 2')
-        first_row = next(cur,[0])[0]
-        second_row = next(cur,[0])[0]
-        try:
-            first_row = float(first_row)
-        except ValueError:
-            first_row = 0
-        try:
-            second_row = float(second_row)
-        except ValueError:
-            second_row = 0
-        dif = first_row - second_row # - + değişimi için yerini değiştir."""
         cur.execute(f'select sum(Difference)from (SELECT stock - LAG(stock) OVER (ORDER BY Date) AS Difference FROM StockPrice where sku="{sku}")')
         dif = cur.fetchone()
         dif = dif[0]
-        print(dif)
         if dif <= 0:
             updateEstimatedSales(sku,dif)
         else:
@@ -191,12 +178,12 @@ licence = getLicenceDate()
 if(today < licence):
     print("Script is working...")
     t0 = time.time()
-    """createDbAndTables()
+    createDbAndTables()
     insertAllSitemapLinks()
-    urls = getSitemapLinks()"""
+    urls = getSitemapLinks()
     """for url in urls:
         getProductInfo(url)"""
-    """PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
     calculateEstimatedSales()
     getPivotStockPrice()
     t1 = time.time()
