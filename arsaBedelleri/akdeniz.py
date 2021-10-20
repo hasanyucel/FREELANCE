@@ -35,7 +35,7 @@ def getMahalleler():
     mahalleler = []
     for mahalle in mahalleler_select:
         mahalleler.append(mahalle['value'])
-        #print(mahalle['value'],mahalle.text)
+        #print(mahalle['value'],mahalle.text) DB insert et
     return mahalleler
 
 def getCaddeSokaklar(mahalleKodu):
@@ -62,10 +62,15 @@ def getCaddeSokaklar(mahalleKodu):
     for cadde in CaddeSokaklar:
         if cadde["CaddeSokakKodu"] != 0:
             caddeler.append(cadde["MahalleId"])
+            #print(cadde["MahalleId"],cadde["CaddeSokakAdi"]) DB insert et
     return caddeler
 
-yillar = getYillar()
+"""yillar = getYillar()
 mahalleler = getMahalleler()
-"""for mahalle in mahalleler:
+for mahalle in mahalleler:
     caddeler = getCaddeSokaklar(mahalle)
-    print(mahalle,caddeler)"""
+    for cadde in caddeler:
+        for yil in yillar:
+            print(yil,mahalle,cadde)"""
+
+caddeler = getCaddeSokaklar("999")
