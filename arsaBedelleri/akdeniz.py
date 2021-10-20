@@ -4,6 +4,21 @@ from rich import print
 
 r = requests.get("https://e-belediye.akdeniz.bel.tr/tr-tr/emlak/arsa-birim-degerleri")
 
+db = "akdeniz.sqlite"
+
+def createDbAndTables():
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Mahalleler' ('MahalleId' TEXT NOT NULL,'Mahalle' TEXT NOT NULL,PRIMARY KEY('MahalleId'));")
+    conn.commit()
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Caddeler' ('CaddeId' TEXT NOT NULL,'Cadde' TEXT NOT NULL,PRIMARY KEY('CaddeId'));")
+    conn.commit()
+    cur.execute("CREATE TABLE IF NOT EXISTS 'Fiyat' ('MahalleId' TEXT NOT NULL,'CaddeId' TEXT NOT NULL,'Yil' TEXT NOT NULL,'BirimFiyat' TEXT,PRIMARY KEY('MahalleId','CaddeId','Yil'));")
+    conn.commit()
+    conn.close()
+
+#Yillar, Mahalleler ve Caddeler veritabanına atılacak. Post atılarak cevapları fiyat tablosuna yazılacak. Caddeler get ile çekilecek.
+
 def getYillar():
     soup = BeautifulSoup(r.content, 'html.parser')
     yillar_html = soup.find("select",attrs={'id':'yil'})
@@ -20,7 +35,7 @@ def getMahalleler():
     mahalleler = []
     for mahalle in mahalleler_select:
         mahalleler.append(mahalle['value'])
-        print(mahalle['value'],mahalle.text)
+        #print(mahalle['value'],mahalle.text)
     return mahalleler
 
 def getCaddeSokaklar(mahalleKodu):
@@ -49,7 +64,8 @@ def getCaddeSokaklar(mahalleKodu):
             caddeler.append(cadde["MahalleId"])
     return caddeler
 
-#caddeler = getCaddeSokaklar("996")
 yillar = getYillar()
 mahalleler = getMahalleler()
-print(mahalleler)
+"""for mahalle in mahalleler:
+    caddeler = getCaddeSokaklar(mahalle)
+    print(mahalle,caddeler)"""
