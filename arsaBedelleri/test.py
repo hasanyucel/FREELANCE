@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests,json,sqlite3,concurrent.futures
+import requests,json,sqlite3,concurrent.futures,pandas as pd
 from rich import print
 
 db = "akdenizBelediyesi.sqlite"
@@ -119,11 +119,22 @@ def PoolExecutor(line):
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
         executor.map(insertArsaBedeli, line)
 
-createDbAndTables()
+def getPivotPrice():
+    conn = sqlite3.connect(db)
+    df = pd.read_sql_query("select t.MahalleAdi,t.CaddeAdi,t.Yil,t.BirimFiyat from birimFiyat t order by t.MahalleAdi,t.CaddeAdi,t.Yil", conn)
+    df = pd.DataFrame(df)
+    df1 = df.pivot_table(index =['MahalleAdi','CaddeAdi'], columns ='Yil', values ='BirimFiyat',aggfunc='first')
+    writer = pd.ExcelWriter('akdeniz.xlsx')
+    df1.to_excel(writer,sheet_name ='Akdeniz')  
+    writer.save()
+    conn.close()
+
+getPivotPrice()
+"""createDbAndTables()
 lines = []
 with open("mahCadSok.txt") as file:
     for line in file:
         line = line.replace("\n", "")
         lines.append(line)
         #insertArsaBedeli(line)
-PoolExecutor(lines)
+PoolExecutor(lines)"""
