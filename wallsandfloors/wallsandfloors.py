@@ -1,7 +1,9 @@
-import requests,sqlite3,cloudscraper
+import requests,time,cloudscraper,sqlite3,concurrent.futures,pandas as pd
+from datetime import datetime
 from bs4 import BeautifulSoup
-from rich import print
+from rich import print 
 
+MAX_THREADS = 30
 db = "wallsandfloors.sqlite"
 
 def createDbAndTables():

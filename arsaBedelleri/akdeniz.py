@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-import requests,json
+import requests,json,sqlite3
 from rich import print
 
 r = requests.get("https://e-belediye.akdeniz.bel.tr/tr-tr/emlak/arsa-birim-degerleri")
@@ -17,8 +17,6 @@ def createDbAndTables():
     conn.commit()
     conn.close()
 
-#Yillar, Mahalleler ve Caddeler veritabanına atılacak. Post atılarak cevapları fiyat tablosuna yazılacak. Caddeler get ile çekilecek.
-
 def getYillar():
     soup = BeautifulSoup(r.content, 'html.parser')
     yillar_html = soup.find("select",attrs={'id':'yil'})
@@ -29,16 +27,23 @@ def getYillar():
     return yillar
 
 def getMahalleler():
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
     soup = BeautifulSoup(r.content, 'html.parser')
     mahalleler_html = soup.find("select",attrs={'id':'MahalleId'})
     mahalleler_select = mahalleler_html.find_all("option") #ilk iki value gereksiz
     mahalleler = []
     for mahalle in mahalleler_select:
         mahalleler.append(mahalle['value'])
+        cur.execute("INSERT OR REPLACE INTO Mahalleler (MahalleId,Mahalle) VALUES (?,?)",(mahalle['value'],mahalle.text))
+        conn.commit()
+    conn.close()
         #print(mahalle['value'],mahalle.text) DB insert et
     return mahalleler
 
 def getCaddeSokaklar(mahalleKodu):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
     url = f"https://e-belediye.akdeniz.bel.tr/tr-tr/cadde-sokak?mahalleKodu={mahalleKodu}"
     headers = {
         'sec-ch-ua': '"Chromium";v="94", "Google Chrome";v="94", ";Not A Brand";v="99"',
@@ -61,16 +66,22 @@ def getCaddeSokaklar(mahalleKodu):
     caddeler = []
     for cadde in CaddeSokaklar:
         if cadde["CaddeSokakKodu"] != 0:
-            caddeler.append(cadde["MahalleId"])
-            #print(cadde["MahalleId"],cadde["CaddeSokakAdi"]) DB insert et
+            caddeler.append(cadde["CaddeSokakKodu"])
+            cur.execute("INSERT OR REPLACE INTO Caddeler (CaddeId,Cadde) VALUES (?,?)",(cadde["CaddeSokakKodu"],cadde["CaddeSokakAdi"]))
+            conn.commit()
+    conn.close()
     return caddeler
 
-"""yillar = getYillar()
+createDbAndTables()
+yillar = getYillar()
 mahalleler = getMahalleler()
+conn = sqlite3.connect(db)
+cur = conn.cursor()
 for mahalle in mahalleler:
     caddeler = getCaddeSokaklar(mahalle)
     for cadde in caddeler:
         for yil in yillar:
-            print(yil,mahalle,cadde)"""
-
-caddeler = getCaddeSokaklar("999")
+            cur.execute("INSERT OR REPLACE INTO Fiyat (MahalleId,CaddeId,Yil) VALUES (?,?,?)",(mahalle,cadde,yil))
+            conn.commit()
+            print(yil,mahalle,cadde)
+conn.close()
