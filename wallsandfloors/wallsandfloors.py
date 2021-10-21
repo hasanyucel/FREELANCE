@@ -41,22 +41,47 @@ def getSitemapLinks():
     conn.close()
     return links
 
-"""createDbAndTables()
+def getProductInfo(url):
+    print(url)
+    scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=20)
+    html = scraper.get(url).content
+    soup = BeautifulSoup(html, 'lxml')
+    specification = soup.find('table',attrs={'id':'product-attribute-specs-table'})
+    sku = soup.find('td',attrs={'id':'product_id_web'}).text.strip()
+    title = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text.strip()
+    listAttributes = {}
+    for tr in specification.findAll('tr'):
+        listAttributes.update({tr.th.text.strip(): tr.th.find_next('td').text.strip()})
+    if "Size" in listAttributes:
+        size = listAttributes["Size"]
+    else:
+        size = "-"
+    if "Sold By" in listAttributes:
+        unit = listAttributes["Sold By"]
+    else:
+        unit = "-"
+    if "Material type" in listAttributes:
+        material = listAttributes["Material type"]
+    else:
+        material = "-"
+    if "Finish" in listAttributes:
+        finish = listAttributes["Finish"]
+    else:
+        finish = "-"
+    price = soup.find('span',attrs={"class":"price"})
+    if price is not None:
+        price = price.text.strip()
+        price = price.replace("£","")
+    
+    stock = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
+    stock = stock.split(" ")
+    stock = stock[0]
+    print(sku,title,size,unit,material,finish,stock,price)
+    time.sleep(0,25)
+
+
+createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
-print(urls)"""
-
-url = "https://www.wallsandfloors.co.uk/flat-covent-garden-pink-gloss-200x100-tiles/"
-scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=10)
-html = scraper.get(url).content
-soup = BeautifulSoup(html, 'lxml')
-sku = soup.find('td',attrs={'id':'product_id_web'}).text
-name = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text
-categories = soup.find('ul',attrs={'class':'list-inline f14'})
-categories = categories.find_all('span',attrs={'itemprop':'name'})
-category = []
-for x in categories:
-    category.append(x.text.strip())
-category = '/'.join(category)
-
-print(category)
+for url in urls:
+    getProductInfo(url)
