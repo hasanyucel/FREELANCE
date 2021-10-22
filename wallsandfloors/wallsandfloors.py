@@ -47,43 +47,48 @@ def getProductInfo(url):
     html = scraper.get(url).content
     soup = BeautifulSoup(html, 'lxml')
     page_title = soup.title.text
-    if page_title != "404 Not Found | Walls and Floors":
-        listAttributes = {}
-        specification = soup.find('table',attrs={'id':'product-attribute-specs-table'})
-        #print(specification)
-        for tr in specification.findAll('tr'):
-            listAttributes.update({tr.th.text.strip(): tr.th.find_next('td').text.strip()})
-        if "Sku" in listAttributes:
-            sku = listAttributes["Sku"]
-        else:
-            sku = "-"
-        title = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text.strip()
-        if "Size" in listAttributes:
-            size = listAttributes["Size"]
-        else:
-            size = "-"
-        if "Sold By" in listAttributes:
-            unit = listAttributes["Sold By"]
-        else:
-            unit = "-"
-        if "Material type" in listAttributes:
-            material = listAttributes["Material type"]
-        else:
-            material = "-"
-        if "Finish" in listAttributes:
-            finish = listAttributes["Finish"]
-        else:
-            finish = "-"
-        price = soup.find('span',attrs={"class":"price"})
-        if price is not None:
-            price = price.text.strip()
-            price = price.replace("£","")
+    if page_title.startswith("404 Not Found") == False:
+        page_type = soup.find("meta", property="og:type")
+        if page_type is not None:
+            page_type = page_type['content']
+            if page_type == 'product':
+                listAttributes = {}
+                time.sleep(0.25)
+                specification = soup.find('section',attrs={'class':'block component-waf-accordion -xs'})
+                if specification is not None:
+                    for tr in specification.find_all('tr'):
+                        listAttributes.update({tr.th.text.strip(): tr.th.find_next('td').text.strip()})
+                    if "Sku" in listAttributes:
+                        sku = listAttributes["Sku"]
+                    else:
+                        sku = "-"
+                    title = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text.strip()
+                    if "Size" in listAttributes:
+                        size = listAttributes["Size"]
+                    else:
+                        size = "-"
+                    if "Sold By" in listAttributes:
+                        unit = listAttributes["Sold By"]
+                    else:
+                        unit = "-"
+                    if "Material type" in listAttributes:
+                        material = listAttributes["Material type"]
+                    else:
+                        material = "-"
+                    if "Finish" in listAttributes:
+                        finish = listAttributes["Finish"]
+                    else:
+                        finish = "-"
+                    price = soup.find('span',attrs={"class":"price"})
+                    if price is not None:
+                        price = price.text.strip()
+                        price = price.replace("£","")
+                    
+                    stock = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
+                    stock = stock.split(" ")
+                    stock = stock[0]
+                    print(sku,title,size,unit,material,finish,stock,price)
         
-        stock = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
-        stock = stock.split(" ")
-        stock = stock[0]
-        print(sku,title,size,unit,material,finish,stock,price)
-        time.sleep(0.25)
 
 
 createDbAndTables()
@@ -91,4 +96,4 @@ insertAllSitemapLinks()
 urls = getSitemapLinks()
 for url in urls:
     getProductInfo(url)
-#getProductInfo("https://www.wallsandfloors.co.uk/brown-triangle-35x35x50mm-tiles")
+getProductInfo("https://www.wallsandfloors.co.uk/super-white-triangle-50x50x70mm-tiles")
