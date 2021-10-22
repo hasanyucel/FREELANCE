@@ -46,38 +46,40 @@ def getProductInfo(url):
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=20)
     html = scraper.get(url).content
     soup = BeautifulSoup(html, 'lxml')
-    specification = soup.find('table',attrs={'id':'product-attribute-specs-table'})
-    sku = soup.find('td',attrs={'id':'product_id_web'}).text.strip()
-    title = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text.strip()
-    listAttributes = {}
-    for tr in specification.findAll('tr'):
-        listAttributes.update({tr.th.text.strip(): tr.th.find_next('td').text.strip()})
-    if "Size" in listAttributes:
-        size = listAttributes["Size"]
-    else:
-        size = "-"
-    if "Sold By" in listAttributes:
-        unit = listAttributes["Sold By"]
-    else:
-        unit = "-"
-    if "Material type" in listAttributes:
-        material = listAttributes["Material type"]
-    else:
-        material = "-"
-    if "Finish" in listAttributes:
-        finish = listAttributes["Finish"]
-    else:
-        finish = "-"
-    price = soup.find('span',attrs={"class":"price"})
-    if price is not None:
-        price = price.text.strip()
-        price = price.replace("£","")
-    
-    stock = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
-    stock = stock.split(" ")
-    stock = stock[0]
-    print(sku,title,size,unit,material,finish,stock,price)
-    time.sleep(0,25)
+    page_title = soup.title.text
+    if page_title != "404 Not Found | Walls and Floors":
+        specification = soup.find('table',attrs={'id':'product-attribute-specs-table'})
+        sku = soup.find('td',attrs={'id':'product_id_web'}).text.strip()
+        title = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text.strip()
+        listAttributes = {}
+        for tr in specification.findAll('tr'):
+            listAttributes.update({tr.th.text.strip(): tr.th.find_next('td').text.strip()})
+        if "Size" in listAttributes:
+            size = listAttributes["Size"]
+        else:
+            size = "-"
+        if "Sold By" in listAttributes:
+            unit = listAttributes["Sold By"]
+        else:
+            unit = "-"
+        if "Material type" in listAttributes:
+            material = listAttributes["Material type"]
+        else:
+            material = "-"
+        if "Finish" in listAttributes:
+            finish = listAttributes["Finish"]
+        else:
+            finish = "-"
+        price = soup.find('span',attrs={"class":"price"})
+        if price is not None:
+            price = price.text.strip()
+            price = price.replace("£","")
+        
+        stock = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
+        stock = stock.split(" ")
+        stock = stock[0]
+        print(sku,title,size,unit,material,finish,stock,price)
+        time.sleep(0.25)
 
 
 createDbAndTables()
