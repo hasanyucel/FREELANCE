@@ -48,12 +48,16 @@ def getProductInfo(url):
     soup = BeautifulSoup(html, 'lxml')
     page_title = soup.title.text
     if page_title != "404 Not Found | Walls and Floors":
-        specification = soup.find('table',attrs={'id':'product-attribute-specs-table'})
-        sku = soup.find('td',attrs={'id':'product_id_web'}).text.strip()
-        title = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text.strip()
         listAttributes = {}
+        specification = soup.find('table',attrs={'id':'product-attribute-specs-table'})
+        #print(specification)
         for tr in specification.findAll('tr'):
             listAttributes.update({tr.th.text.strip(): tr.th.find_next('td').text.strip()})
+        if "Sku" in listAttributes:
+            sku = listAttributes["Sku"]
+        else:
+            sku = "-"
+        title = soup.find('h1',attrs={'class':'heading heading8 hidden-xs'}).text.strip()
         if "Size" in listAttributes:
             size = listAttributes["Size"]
         else:
@@ -87,3 +91,4 @@ insertAllSitemapLinks()
 urls = getSitemapLinks()
 for url in urls:
     getProductInfo(url)
+#getProductInfo("https://www.wallsandfloors.co.uk/brown-triangle-35x35x50mm-tiles")
