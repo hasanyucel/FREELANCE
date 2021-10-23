@@ -84,8 +84,11 @@ def getProductInfo(url):
                         price = price.replace("£","")
                     
                     stock = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
-                    stock = stock.split(" ")
-                    stock = stock[0]
+                    if stock.startswith("In") or stock.startswith("Out"):
+                        stock = stock + ""
+                    else:
+                        stock = stock.split(" ")
+                        stock = stock[0]
                     print(sku,title,size,unit,material,finish,stock,price)
                     insertProductInfos(sku,title,"",size,unit,material,finish,url,price) 
                     date = datetime.today().strftime("%d/%m/%Y")
