@@ -66,10 +66,6 @@ def getProductInfo(url):
                         size = listAttributes["Size"]
                     else:
                         size = "-"
-                    if "Sold By" in listAttributes:
-                        unit = listAttributes["Sold By"]
-                    else:
-                        unit = "-"
                     if "Material type" in listAttributes:
                         material = listAttributes["Material type"]
                     else:
@@ -82,13 +78,20 @@ def getProductInfo(url):
                     if price is not None:
                         price = price.text.strip()
                         price = price.replace("£","")
-                    
                     stock = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
                     if stock.startswith("In") or stock.startswith("Out"):
                         stock = stock + ""
                     else:
                         stock = stock.split(" ")
                         stock = stock[0]
+                    unit = soup.find('div', attrs={"class":"stock-due-date"}).text.strip()
+                    unit = unit.replace("In Stock","").replace("Out of Stock","").replace(" ","")
+                    unit = ''.join([i for i in unit if not i.isdigit()])
+                    if len(unit) == 0:
+                        if "Sold By" in listAttributes:
+                            unit = listAttributes["Sold By"]
+                        else:
+                            unit = "-"
                     print(sku,title,size,unit,material,finish,stock,price)
                     insertProductInfos(sku,title,"",size,unit,material,finish,url,price) 
                     date = datetime.today().strftime("%d/%m/%Y")
@@ -168,6 +171,7 @@ urls = getSitemapLinks()
 PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
 calculateEstimatedSales()
 getPivotStockPrice()
+#getProductInfo("https://www.wallsandfloors.co.uk/churchill-snow-midnight-chequer-mosaic-tiles")
 t1 = time.time()
 print(f"{t1-t0} seconds.")
 

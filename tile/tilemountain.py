@@ -176,22 +176,22 @@ def updateEstimatedSales(sku,dif):
     conn.close()
 
 today = datetime.today().strftime("%d/%m/%Y")
-licence = getLicenceDate()
-if(today < licence):
-    print("Script is working...")
-    t0 = time.time()
-    createDbAndTables()
-    insertAllSitemapLinks()
-    urls = getSitemapLinks()
-    """for url in urls:
-        getProductInfo(url)"""
-    PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
-    calculateEstimatedSales()
-    getPivotStockPrice()
-    t1 = time.time()
-    print(f"{t1-t0} seconds.")
-else:
-    print("Trial time has been finished.")
+#licence = getLicenceDate()
+#if(today < licence):
+print("Script is working...")
+t0 = time.time()
+createDbAndTables()
+insertAllSitemapLinks()
+urls = getSitemapLinks()
+"""for url in urls:
+    getProductInfo(url)"""
+PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+calculateEstimatedSales()
+getPivotStockPrice()
+t1 = time.time()
+print(f"{t1-t0} seconds.")
+#else:
+#    print("Trial time has been finished.")
 
 import sys
 def check_quit(inp):
