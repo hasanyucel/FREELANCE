@@ -1,8 +1,8 @@
-import cloudscraper
-from rich import print
+import requests
+from requests_html import HTMLSession
+from bs4 import BeautifulSoup
 
 url = "https://www.turkiye.gov.tr/mersin-yenisehir-belediyesi-arsa-rayic-degeri-sorgulama?submit"
-
 payload='btn=Sorgula&caddesokak=3003735&id=&islem=&mahalle=23&token=%7BB83DD6-C84843-6650EB-4D7958-201C49-E65B87-4AB197-D34D8A%7D&yil=2021'
 headers = {
   'sec-ch-ua': '"Google Chrome";v="95", "Chromium";v="95", ";Not A Brand";v="99"',
@@ -19,8 +19,11 @@ headers = {
   'Sec-Fetch-Dest': 'document',
   'Cookie': 'TURKIYESESSIONID=hu8gu6l1pfek6d41bnmjioeopf; language=tr_TR.UTF-8; TS01ee3a52=015c1cbb6d4ace793017ae53d8a57df2409ee42c673d531d8a05725d070df91c9c3dad301674d4a3e7a48ac675fa46ff139e9cec2dfc6654383cb82e75035297ec86c7fb3b3cf4c09f9e512ea43e548e0c89d0855d; w3p=2698225856.20480.0000'
 }
+session = HTMLSession()
+r = session.get("https://www.turkiye.gov.tr/mersin-yenisehir-belediyesi-arsa-rayic-degeri-sorgulama")
+cookies = dict(r.cookies)
+html_text = session.post(url, data=payload, headers=headers, cookies=cookies)
+html_text.html.render()
+soup = BeautifulSoup(html_text.html.html, 'lxml')
 
-scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=10)
-html = scraper.post(url, data=payload, headers=headers)
-
-print(html.content)
+print(soup)
