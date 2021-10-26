@@ -97,7 +97,7 @@ def getProductInfo(url):
                     date = datetime.today().strftime("%d/%m/%Y")
                     insertProductStockPrice(sku, date, stock, price)
         
-def insertProductInfos(sku,name,categories,size,unit,material,finish,url,currentprice):
+def insertProductInfos(sku,name,categories,size,unit,material,finish,currentprice):
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,unit,material,finish,url,currentprice) VALUES (?,?,?,?,?,?,?,?,?)",(sku,name,categories,size,unit,material,finish,url,currentprice))
@@ -161,17 +161,14 @@ def getPivotStockPrice():
     writer.save()
     conn.close()
 
-print("Script is working...")
+print("Script is working.")
 t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
-"""for url in urls:
-    getProductInfo(url)"""
 PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
 calculateEstimatedSales()
 getPivotStockPrice()
-#getProductInfo("https://www.wallsandfloors.co.uk/churchill-snow-midnight-chequer-mosaic-tiles")
 t1 = time.time()
 print(f"{t1-t0} seconds.")
 
