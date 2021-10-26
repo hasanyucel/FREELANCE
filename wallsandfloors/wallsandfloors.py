@@ -41,6 +41,16 @@ def getSitemapLinks():
     conn.close()
     return links
 
+def getEmptyStocks():
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    today = datetime.today().strftime("%d/%m/%Y")
+    cur.execute(f'select url from products where sku in (SELECT t.sku FROM products t WHERE t.sku NOT IN (SELECT l.sku FROM stockprice l WHERE l.date = "{today}"))')
+    links = cur.fetchall()
+    links = [f[0] for f in links]
+    conn.close()
+    return links
+
 def getProductInfo(url):
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=20)
     html = scraper.get(url).content
@@ -166,10 +176,10 @@ t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
-"""for url in urls:
-    getProductInfo(url)"""
 PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
-#SELECT t.sku FROM products t WHERE t.sku NOT IN (SELECT l.sku FROM stockprice l WHERE l.date = '26/10/2021') Boşlara tekrar istek at.
+for i in range(3):
+    urls = getEmptyStocks()
+    PoolExecutor(urls)
 calculateEstimatedSales()
 getPivotStockPrice()
 t1 = time.time()
