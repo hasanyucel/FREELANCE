@@ -97,7 +97,7 @@ def getProductInfo(url):
                     date = datetime.today().strftime("%d/%m/%Y")
                     insertProductStockPrice(sku, date, stock, price)
         
-def insertProductInfos(sku,name,categories,size,unit,material,finish,currentprice):
+def insertProductInfos(sku,name,categories,size,unit,material,finish,url,currentprice):
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute("INSERT OR REPLACE INTO Products (sku,name,categories,size,unit,material,finish,url,currentprice) VALUES (?,?,?,?,?,?,?,?,?)",(sku,name,categories,size,unit,material,finish,url,currentprice))
@@ -166,7 +166,10 @@ t0 = time.time()
 createDbAndTables()
 insertAllSitemapLinks()
 urls = getSitemapLinks()
+"""for url in urls:
+    getProductInfo(url)"""
 PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+#SELECT t.sku FROM products t WHERE t.sku NOT IN (SELECT l.sku FROM stockprice l WHERE l.date = '26/10/2021') Boşlara tekrar istek at.
 calculateEstimatedSales()
 getPivotStockPrice()
 t1 = time.time()
