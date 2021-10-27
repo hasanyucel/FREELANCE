@@ -1,5 +1,5 @@
 import requests,time,cloudscraper,sqlite3,concurrent.futures,pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from rich import print 
 
@@ -106,7 +106,8 @@ def insertProductStockPrice(sku,date,stock,price):
 
 def PoolExecutor(urls):
     threads = min(MAX_THREADS, len(urls))
-    
+    if threads == 0:
+        threads = 1
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
         executor.map(getProductInfo, urls)
 
@@ -114,6 +115,16 @@ def getSitemapLinks():
     conn = sqlite3.connect(db)
     cur = conn.cursor()
     cur.execute('SELECT Url FROM SiteMapLinks')
+    links = cur.fetchall()
+    links = [f[0] for f in links]
+    conn.close()
+    return links
+
+def getEmptyStocks():
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    today = datetime.now(timezone.utc).strftime("%d/%m/%Y")
+    cur.execute(f'select url from products where sku in (SELECT t.sku FROM products t WHERE t.sku NOT IN (SELECT l.sku FROM stockprice l WHERE l.date = "{today}"))')
     links = cur.fetchall()
     links = [f[0] for f in links]
     conn.close()
@@ -136,18 +147,6 @@ def getPivotStockPrice():
     df2.to_excel(writer,sheet_name ='Stock')  
     writer.save()
     conn.close()
-
-def getLicenceDate():
-    licence_key = "YPNPN5QBXUON"
-    link = "https://drive.google.com/file/d/1bZ87-1f2WRU5i0etRLAYRIbaPXax1dz4/view?usp=sharing"
-    """with open('licence.txt') as f:
-        licence_key = f.readline().strip()"""
-    file_id=link.split('/')[-2]
-    dwn_url='https://drive.google.com/uc?id=' + file_id
-    df = pd.read_csv(dwn_url)
-    row = df.query('account == "tilemountain" & key == "'+licence_key+'"')
-    tarih = row["tarih"].values[0]
-    return tarih
 
 def calculateEstimatedSales():
     conn = sqlite3.connect(db)
@@ -176,8 +175,6 @@ def updateEstimatedSales(sku,dif):
     conn.close()
 
 today = datetime.today().strftime("%d/%m/%Y")
-#licence = getLicenceDate()
-#if(today < licence):
 print("Script is working...")
 t0 = time.time()
 createDbAndTables()
@@ -185,13 +182,14 @@ insertAllSitemapLinks()
 urls = getSitemapLinks()
 """for url in urls:
     getProductInfo(url)"""
-PoolExecutor(urls)#Hatalar alınmıyor. Manuel test et."""
+PoolExecutor(urls)
+for i in range(3):
+    urls = getEmptyStocks()
+    PoolExecutor(urls)
 calculateEstimatedSales()
 getPivotStockPrice()
 t1 = time.time()
 print(f"{t1-t0} seconds.")
-#else:
-#    print("Trial time has been finished.")
 
 import sys
 def check_quit(inp):
