@@ -1,5 +1,5 @@
 import requests,time,cloudscraper,sqlite3,concurrent.futures,pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 from rich import print 
 
@@ -44,7 +44,7 @@ def getSitemapLinks():
 def getEmptyStocks():
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    today = datetime.today().strftime("%d/%m/%Y")
+    today = datetime.now(timezone.utc).strftime("%d/%m/%Y")
     cur.execute(f'select url from products where sku in (SELECT t.sku FROM products t WHERE t.sku NOT IN (SELECT l.sku FROM stockprice l WHERE l.date = "{today}"))')
     links = cur.fetchall()
     links = [f[0] for f in links]
@@ -123,7 +123,8 @@ def insertProductStockPrice(sku,date,stock,price):
 
 def PoolExecutor(urls):
     threads = min(MAX_THREADS, len(urls))
-    
+    if threads == 0:
+        threads = 1
     with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
         executor.map(getProductInfo, urls)
 
