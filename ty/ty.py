@@ -2,6 +2,7 @@ from GetProducts import *
 from GetProductInfo import *
 import sqlite3,timeit
 import pandas as pd
+from rich import print
 
 database = 'veritabani.sqlite'
 url = "https://www.trendyol.com/soundbar-x-c143233"
@@ -20,7 +21,7 @@ def getProducts(url):
 def getProductInfos():
     db = sqlite3.connect(database)
     cursor = db.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS product_details (product_id, product_name, product_brand, product_orginal_price,product_selling_price,product_discounted_price,product_rating_count,product_rating_average,product_comment_count,product_favorite_count,seller_name,seller_score,seller_tax_number,seller_city,seller_official_name,seller_count,product_all_sellers,product_url)")
+    #cursor.execute("CREATE TABLE IF NOT EXISTS product_details (product_id, product_name, product_brand, product_orginal_price,product_selling_price,product_discounted_price,product_rating_count,product_rating_average,product_comment_count,product_favorite_count,seller_name,seller_score,seller_tax_number,seller_city,seller_official_name,seller_count,product_all_sellers,product_url)")
     cursor.execute("select * from products")
     rows = cursor.fetchall()
     df = pd.DataFrame(columns=['Ürün ID','Ürün Adı','Marka','Orjinal Fiyat','Satış Fiyatı','İndirimli Fiyat','Değerlendirme Sayısı','Değerlendirme Ortalaması','Yorum Sayısı','Favori Sayısı','Satıcı Adı','Satıcı Puanı','Satıcı Vergi No','Satıcı Şehiri','Satıcı Şirket Adı','Ürünü Satan Sayısı','Tüm Satıcılar','Ürün Linki'])
@@ -60,4 +61,4 @@ def getProductInfos():
     df.to_excel("output.xlsx") 
 
 product = GetProductInfo("https://www.trendyol.com/kom/kadin-ten-parah-sutyen-p-106815204")
-print(product.getAllProductData())
+print(product.getProductURL())

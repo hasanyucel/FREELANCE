@@ -32,7 +32,7 @@ class GetProductInfo:
         return self.data["product"]["id"]
 
     def saveImages(self):
-        images = ['https://www.trendyol.com' + img for img in self.data['product']['images']]
+        images = ['https://cdn.dsmcdn.com/' + img for img in self.data['product']['images']]
         if not os.path.exists('images/'+str(self.data["product"]["id"])+''):
             os.makedirs('images/'+str(self.data["product"]["id"])+'')
         i = 1
