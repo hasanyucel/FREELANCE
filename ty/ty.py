@@ -5,7 +5,7 @@ import pandas as pd
 from rich import print
 
 database = 'veritabani.sqlite'
-url = "https://www.trendyol.com/soundbar-x-c143233"
+url = "https://www.trendyol.com/kadin-sutyen-x-g1-c63"
 
 def getProducts(url):
     products = GetProducts(url)
@@ -24,41 +24,36 @@ def getProductInfos():
     #cursor.execute("CREATE TABLE IF NOT EXISTS product_details (product_id, product_name, product_brand, product_orginal_price,product_selling_price,product_discounted_price,product_rating_count,product_rating_average,product_comment_count,product_favorite_count,seller_name,seller_score,seller_tax_number,seller_city,seller_official_name,seller_count,product_all_sellers,product_url)")
     cursor.execute("select * from products")
     rows = cursor.fetchall()
-    df = pd.DataFrame(columns=['Ürün ID','Ürün Adı','Marka','Orjinal Fiyat','Satış Fiyatı','İndirimli Fiyat','Değerlendirme Sayısı','Değerlendirme Ortalaması','Yorum Sayısı','Favori Sayısı','Satıcı Adı','Satıcı Puanı','Satıcı Vergi No','Satıcı Şehiri','Satıcı Şirket Adı','Ürünü Satan Sayısı','Tüm Satıcılar','Ürün Linki'])
-    start = timeit.default_timer()
-    i=0
+    df = pd.DataFrame(columns=['Ürün ID','Barkod','Ürün Adı','Ürün Özellikleri','Varyant','Fiyat','Fotoğraflar','Ürün Bilgileri','Teslimat Bilgisi', 'Ürün Linki'])
+    i = 0
     for row in rows:
-        #try:
-        product = GetProductInfo(row[1])
-        product_id = product.getProductID()
+        print(row[1])
+        product = GetProductInfo("https://www.trendyol.com/chc-chocho/kadin-balenli-dolgusuz-4-lu-sutyen-takimi-p-168017910")
+        product_all_data = product.getAllProductData()
         product_name = product.getProductName()
-        product_brand = product.getProductBrand()
-        product_orginal_price = product.getProductOrginalPrice()
-        product_selling_price = product.getProductSellingPrice()
-        product_discounted_price = product.getProductDiscountedPrice()
-        product_rating_count = product.getProductRatingCount()
-        product_rating_average = product.getProductAverageRating()
-        product_comment_count = product.getProductTotalCommentCount()
-        product_favorite_count = product.getProductFavoriteCount()
-        seller_name = product.getProductSellerName()
-        seller_score = product.getProductSellerScore()
-        seller_tax_number  = product.getProductSellerTaxNumber()
-        seller_city = product.getProductSellerCityName()
-        seller_official_name = product.getProductSellerOfficialName()
-        seller_count = product.getProductMerhactCount()
-        product_all_sellers = product.getProductAllMerchantNames()
-        product_url = product.getProductURL()
-        #cursor.execute("INSERT INTO product_details VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", (product_id, product_name, product_brand, product_orginal_price,product_selling_price,product_discounted_price,product_rating_count,product_rating_average,product_comment_count,product_favorite_count,seller_name,seller_score,seller_tax_number,seller_city,seller_official_name,seller_count,product_all_sellers,product_url))
-        #db.commit()
-        satir = {'Ürün ID':product_id, 'Ürün Adı':product_name, 'Marka':product_brand, 'Orjinal Fiyat':product_orginal_price,'Satış Fiyatı':product_selling_price,'İndirimli Fiyat':product_discounted_price,'Değerlendirme Sayısı':product_rating_count,'Değerlendirme Ortalaması':product_rating_average,'Yorum Sayısı':product_comment_count,'Favori Sayısı':product_favorite_count,'Satıcı Adı':seller_name,'Satıcı Puanı':seller_score,'Satıcı Vergi No':seller_tax_number,'Satıcı Şehiri':seller_city,'Satıcı Şirket Adı':seller_official_name,'Ürünü Satan Sayısı':seller_count,'Tüm Satıcılar':product_all_sellers,'Ürün Linki':product_url}
-        df = df.append(satir, ignore_index=True)
-        #except:
-        #    print("error",row)
+        product_attributes = product.getAttributes()
+        product_variants = product_all_data['variants']
+        product_images = product.getImages()
+        product_details = product.getDetails()
+        product_delivery = product.getDeliveryInformation()
+        product_link = product.getProductURL()
+        print(product_attributes)
+        for variant in product_variants:
+            attr = variant['attributeName']+":"+variant['attributeValue']
+            item_number = variant['itemNumber']
+            barcode = variant['barcode']
+            price = variant['price']['discountedPrice']['value']
+            satir = {'Ürün ID':item_number, 'Barkod': barcode, 'Ürün Adı':product_name, 'Ürün Özellikleri':product_attributes,'Varyant':attr,'Fiyat':price, 'Fotoğraflar':product_images,'Ürün Bilgileri':product_details,'Teslimat Bilgisi':product_delivery,'Ürün Linki':product_link}
+            #print(satir)
+            df = df.append(satir, ignore_index=True)
+        i=+1
+        if i == 1:
+            break
     db.close()
-    stop = timeit.default_timer()
-    print('Time: ', stop - start) 
     print(df)
     df.to_excel("output.xlsx") 
 
-product = GetProductInfo("https://www.trendyol.com/kom/kadin-ten-parah-sutyen-p-106815204")
-print(product.getProductURL())
+
+#getProducts(url)
+getProductInfos()
+
