@@ -174,7 +174,6 @@ def updateEstimatedSales(sku,dif):
     conn.commit()
     conn.close()
 
-today = datetime.today().strftime("%d/%m/%Y")
 print("Script is working...")
 t0 = time.time()
 createDbAndTables()

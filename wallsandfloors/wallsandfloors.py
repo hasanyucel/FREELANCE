@@ -44,7 +44,7 @@ def getSitemapLinks():
 def getEmptyStocks():
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    today = datetime.now(timezone.utc).strftime("%d/%m/%Y")
+    today = datetime.now(timezone.utc).strftime("%Y/%m/%d")
     cur.execute(f'select url from products where sku in (SELECT t.sku FROM products t WHERE t.sku NOT IN (SELECT l.sku FROM stockprice l WHERE l.date = "{today}"))')
     links = cur.fetchall()
     links = [f[0] for f in links]
@@ -104,7 +104,7 @@ def getProductInfo(url):
                             unit = "-"
                     print(sku,title,size,unit,material,finish,stock,price)
                     insertProductInfos(sku,title,"",size,unit,material,finish,url,price) 
-                    date = datetime.today().strftime("%d/%m/%Y")
+                    date = datetime.today().strftime("%Y/%m/%d")
                     insertProductStockPrice(sku, date, stock, price)
         
 def insertProductInfos(sku,name,categories,size,unit,material,finish,url,currentprice):
