@@ -28,7 +28,7 @@ def getProductInfos():
     i = 0
     for row in rows:
         print(row[1])
-        product = GetProductInfo("https://www.trendyol.com/chc-chocho/kadin-balenli-dolgusuz-4-lu-sutyen-takimi-p-168017910")
+        product = GetProductInfo(row[1])
         product_all_data = product.getAllProductData()
         product_name = product.getProductName()
         product_attributes = product.getAttributes()
@@ -46,8 +46,8 @@ def getProductInfos():
             satir = {'Ürün ID':item_number, 'Barkod': barcode, 'Ürün Adı':product_name, 'Ürün Özellikleri':product_attributes,'Varyant':attr,'Fiyat':price, 'Fotoğraflar':product_images,'Ürün Bilgileri':product_details,'Teslimat Bilgisi':product_delivery,'Ürün Linki':product_link}
             #print(satir)
             df = df.append(satir, ignore_index=True)
-        i=+1
-        if i == 1:
+        i=i+1
+        if i == 10:
             break
     db.close()
     print(df)
