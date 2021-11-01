@@ -85,7 +85,7 @@ def getProductInfo(url):
         categories.append(x.text.strip())
     categories = '/'.join(categories)
     insertProductInfos(sku,title,categories,size,unit,material,finish,url,price) 
-    date = datetime.today().strftime("%d/%m/%Y")
+    date = datetime.today().strftime("%Y/%m/%d")
     insertProductStockPrice(sku, date, stock, price)
     time.sleep(1)
     print(sku,title,categories,size,unit,material,finish,stock,price,url)
@@ -123,7 +123,7 @@ def getSitemapLinks():
 def getEmptyStocks():
     conn = sqlite3.connect(db)
     cur = conn.cursor()
-    today = datetime.now(timezone.utc).strftime("%d/%m/%Y")
+    today = datetime.now(timezone.utc).strftime("%Y/%m/%d")
     cur.execute(f'select url from products where sku in (SELECT t.sku FROM products t WHERE t.sku NOT IN (SELECT l.sku FROM stockprice l WHERE l.date = "{today}"))')
     links = cur.fetchall()
     links = [f[0] for f in links]
@@ -135,7 +135,7 @@ def makeHyperlink(url):
 
 def getPivotStockPrice():
     conn = sqlite3.connect(db)
-    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,p.currentprice,p.estimatedsales,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by p.categories", conn)
+    df = pd.read_sql_query("select distinct p.url,p.sku,p.name,p.size,p.unit,p.material,p.finish,p.currentprice,p.estimatedsales,s.date,s.stock,s.price from products p join stockprice s on p.sku = s.sku order by s.date", conn)
     df = pd.DataFrame(df)
     df['Url'] = df.apply(lambda row : makeHyperlink(row['Url']), axis = 1)
     df1 = df.pivot_table(index =['Url','SKU','Name','Size','CurrentPrice','EstimatedSales','Unit','Material','Finish'], columns ='Date', values ='Price',aggfunc='first')
