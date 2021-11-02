@@ -47,7 +47,7 @@ def getProductInfos():
             #print(satir)
             df = df.append(satir, ignore_index=True)
         i=i+1
-        if i == 10:
+        if i == 100:
             break
     db.close()
     print(df)

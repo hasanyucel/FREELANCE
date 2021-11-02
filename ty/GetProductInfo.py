@@ -10,9 +10,17 @@ class GetProductInfo:
     def __init__(self,link):
         r = requests.get(link)
         soup = BeautifulSoup(r.text, 'html.parser')
+        #404 sayfaları engelle h1
         products = soup.find_all("script")[14]
+        print(products)
         pattern = '\{(?:[^{}]|(?R))*\}'
-        result = regex.search(pattern, str(products)).group(0)
+        result = regex.search(pattern, str(products))
+        if result is None:
+            products = soup.find_all("script")[15]
+            result = regex.search(pattern, str(products))[0]
+        else:
+            products = soup.find_all("script")[14]
+            result = regex.search(pattern, str(products))[0]
         #fi = str(products).find('{')
         #li = str(products).rfind('}') + 1
         #result = str(products)[fi:li]
