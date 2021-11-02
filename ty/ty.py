@@ -29,7 +29,7 @@ def getProductInfos():
     for row in rows:
         print(row[1])
         product = GetProductInfo(row[1])
-        if product.control() == "Not Found"
+        if product.control() == "Not Found":
             continue
         product_all_data = product.getAllProductData()
         product_name = product.getProductName()

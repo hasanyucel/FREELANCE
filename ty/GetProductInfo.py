@@ -15,15 +15,15 @@ class GetProductInfo:
         if nf == "404":
             self.data = "Not Found"
         else:
-            products = soup.find_all("script")[14]
+            products = soup.find_all("script")[15]
             print(products)
             pattern = '\{(?:[^{}]|(?R))*\}'
             result = regex.search(pattern, str(products))
             if result is None:
-                products = soup.find_all("script")[15]
+                products = soup.find_all("script")[14]
                 result = regex.search(pattern, str(products))[0]
             else:
-                products = soup.find_all("script")[14]
+                products = soup.find_all("script")[15]
                 result = regex.search(pattern, str(products))[0]
 
             print(result)
