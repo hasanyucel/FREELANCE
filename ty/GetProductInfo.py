@@ -1,4 +1,4 @@
-import requests, json, regex, os
+import requests, json, regex, os, re
 from lxml import html
 from bs4 import BeautifulSoup
 from rich import print
@@ -10,8 +10,7 @@ class GetProductInfo:
     def __init__(self,link):
         r = requests.get(link)
         soup = BeautifulSoup(r.text, 'html.parser')
-        #404 sayfaları engelle h1
-        nf = soup.find("h1")
+        nf = soup.find("h1").text
         if nf == "404":
             self.data = "Not Found"
         else:
