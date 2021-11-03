@@ -1,10 +1,10 @@
-import json, regex, re, cloudscraper
+import json, regex, re, cloudscraper, time, sys
 from bs4 import BeautifulSoup
 import pandas as pd
 from rich import print
 
-cat_or_seller = 1 #1 Kategori 2 Satıcı
-url = "https://www.trendyol.com/cocuk-babet-x-g3-c113"
+cat_or_seller = 2 #1 Kategori 2 Satıcı
+url = "https://www.trendyol.com/sr?mid=147054"
 urun_adedi = 100
 
 
@@ -58,14 +58,61 @@ def getGetProductDetailInfo(url):
         data = json.loads(result)
     return data
 
+def makeHyperlink(url):
+    return f'=Hyperlink("{url}","Ürün")'
+
 def createExcelProductDetails(productLinks,urun_adedi):
+    counter = 1
+    df = pd.DataFrame(columns=['Ürün ID','Barkod','Ürün Adı','Ürün Özellikleri','Varyant','Fiyat','Fotoğraflar','Ürün Bilgileri','Teslimat Bilgisi', 'Link'])
     for link in productLinks:
         productDetailData = getGetProductDetailInfo(link) # Ürün linklerindeki ürünlerin detaylarını getir.
         if productDetailData == "Not Found":
-            continue
+            continue   
+        product_name = productDetailData["product"]["name"]
+        attr = productDetailData["product"]["attributes"]
+        result = ""
+        for at in attr:
+            result = result + at['key']['name'] + " : " + at['value']['name'] + " | "
+        product_attributes = result[:-2]
+        product_variants = productDetailData['product']['variants']
+        images = ['https://cdn.dsmcdn.com/' + img for img in productDetailData['product']['images']]
+        img = ""
+        for image in images:
+            img = img + image +  " | "
+        product_images = img[:-2]
+        product_details = productDetailData["product"]["contentDescriptions"][0]["description"]
+        product_delivery = productDetailData["product"]["deliveryInformation"]["deliveryDate"]
+        product_link = 'https://www.trendyol.com'+productDetailData["product"]["url"]
+        for variant in product_variants:
+            attr = variant['attributeName']+":"+variant['attributeValue']
+            urun_id = productDetailData["product"]["id"]
+            barcode = variant['barcode']
+            price = variant['price']['discountedPrice']['value']
+            satir = {'Ürün ID':urun_id, 'Barkod': barcode, 'Ürün Adı':product_name, 'Ürün Özellikleri':product_attributes,'Varyant':attr,'Fiyat':price, 'Fotoğraflar':product_images,'Ürün Bilgileri':product_details,'Teslimat Bilgisi':product_delivery,'Link':product_link}
+            print(counter," - ", product_name," - ", attr," - ", price," TL")
+            df = df.append(satir, ignore_index=True)
+        counter = counter + 1
+        urun_adedi = urun_adedi - 1
+        if urun_adedi == 0:
+            break
+    #print(df)
+    df['Link'] = df.apply(lambda row : makeHyperlink(row['Link']), axis = 1)
+    df.to_excel("output.xlsx") 
 
+t0 = time.time()
+print("Uygulama başladı.")
+print("Linkler Toplanıyor...")
 productPageUrls = createProductPageUrls(url,urun_adedi) # Ürün sayısına göre getirelecek sayfa linklerini oluştur (ürün sayısı / 24)
 productLinks = getProductLinks(productPageUrls) # Sayfalarındaki ürün linklerini getir.
-#print(productLinks)
+print(productLinks)
+print("Ürün detayları çekiliyor...")
 createExcelProductDetails(productLinks,urun_adedi) # Ürün detaylarıyla excel oluşturur.
-#print(productDetailData)
+t1 = time.time()
+print(f"{t1-t0} saniye sürdü.")
+
+
+def check_quit(inp):
+    if inp == 'q':
+        sys.exit(0)
+x = str(input("Lütfen çıkmak için 'q' tuşuna basın: "))
+check_quit(x)
