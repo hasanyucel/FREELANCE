@@ -3,10 +3,14 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from rich import print
 
-cat_or_seller = 2 #1 Kategori 2 Satıcı
-url = "https://www.trendyol.com/sr?mid=147054"
-urun_adedi = 100
+print("--TRENDYOL ÜRÜN BİLGİLERİ ÇEKME UYGULAMASI--")
+print("Kategoriden Ürün Çekmek için --> 1")
+print("Satıcıdan Ürün Çekmek için --> 2")
 
+cat_or_seller = int(input("Lütfen Seçiniz: ")) #1 Kategori 2 Satıcı
+url = input("Ürünlerin Linki: ")
+urun_adedi = int(input("Çekilecek Ürün Adedi: "))
+dosya_adi = input("Dosya Adı: ")
 
 def getCategoryOrSellerProductsData(url):
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=200)
@@ -96,8 +100,8 @@ def createExcelProductDetails(productLinks,urun_adedi):
         if urun_adedi == 0:
             break
     #print(df)
-    df['Link'] = df.apply(lambda row : makeHyperlink(row['Link']), axis = 1)
-    df.to_excel("output.xlsx") 
+    #df['Link'] = df.apply(lambda row : makeHyperlink(row['Link']), axis = 1)
+    df.to_excel(""+dosya_adi+".xlsx") 
 
 t0 = time.time()
 print("Uygulama başladı.")
