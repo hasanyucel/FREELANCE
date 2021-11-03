@@ -1,6 +1,6 @@
-import requests, json, regex, sqlite3
+import requests, json, regex, sqlite3,re
 from bs4 import BeautifulSoup
-
+from rich import print
 
 database = "veritabani.sqlite"
 
@@ -10,9 +10,9 @@ class GetProducts:
     def __init__(self,link):
         r = requests.get(link)
         soup = BeautifulSoup(r.text, 'html.parser')
-        products = soup.find_all("script")[13]
+        products = soup.findAll('script', text = re.compile('__SEARCH_APP_INITIAL_STATE__'))
         pattern = '\{(?:[^{}]|(?R))*\}'
-        result = regex.search(pattern, str(products)).group(0)
+        result = regex.search(pattern, str(products))[0]
         self.data = json.loads(result)
         db = sqlite3.connect(database)
         cursor = db.cursor()

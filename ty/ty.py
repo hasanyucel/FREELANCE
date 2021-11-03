@@ -5,15 +5,20 @@ import pandas as pd
 from rich import print
 
 database = 'veritabani.sqlite'
-url = "https://www.trendyol.com/kadin-sutyen-x-g1-c63"
+url = "https://www.trendyol.com/sr?mid=147054"
+urun_adedi = 10
 
-def getProducts(url):
+def getProductsUrl(url):
     products = GetProducts(url)
     productCount = products.getTotalProductCount()
-    productPage = (productCount / 24) + 1
+    productPage = int((productCount / 24) + 1)
+    loop_count = int((urun_adedi / 24) + 1)
     urls = []
-    for i in range(1,int(productPage)+1):
+    for i in range(1,productPage+1):
         urls.append(url+"?pi="+str(i))
+        loop_count = loop_count - 1
+        if loop_count == 0:
+            break
     for url in urls:
         products = GetProducts(url)
         idAndUrl = products.getAllProductIdUrlToDB()
@@ -21,11 +26,10 @@ def getProducts(url):
 def getProductInfos():
     db = sqlite3.connect(database)
     cursor = db.cursor()
-    #cursor.execute("CREATE TABLE IF NOT EXISTS product_details (product_id, product_name, product_brand, product_orginal_price,product_selling_price,product_discounted_price,product_rating_count,product_rating_average,product_comment_count,product_favorite_count,seller_name,seller_score,seller_tax_number,seller_city,seller_official_name,seller_count,product_all_sellers,product_url)")
     cursor.execute("select * from products")
     rows = cursor.fetchall()
     df = pd.DataFrame(columns=['Ürün ID','Barkod','Ürün Adı','Ürün Özellikleri','Varyant','Fiyat','Fotoğraflar','Ürün Bilgileri','Teslimat Bilgisi', 'Ürün Linki'])
-    i = 0
+    loop_count = urun_adedi
     for row in rows:
         print(row[1])
         product = GetProductInfo(row[1])
@@ -42,20 +46,21 @@ def getProductInfos():
         print(product_attributes)
         for variant in product_variants:
             attr = variant['attributeName']+":"+variant['attributeValue']
-            item_number = variant['itemNumber']
+            urun_id = product.getProductID()
             barcode = variant['barcode']
             price = variant['price']['discountedPrice']['value']
-            satir = {'Ürün ID':item_number, 'Barkod': barcode, 'Ürün Adı':product_name, 'Ürün Özellikleri':product_attributes,'Varyant':attr,'Fiyat':price, 'Fotoğraflar':product_images,'Ürün Bilgileri':product_details,'Teslimat Bilgisi':product_delivery,'Ürün Linki':product_link}
-            #print(satir)
+            satir = {'Ürün ID':urun_id, 'Barkod': barcode, 'Ürün Adı':product_name, 'Ürün Özellikleri':product_attributes,'Varyant':attr,'Fiyat':price, 'Fotoğraflar':product_images,'Ürün Bilgileri':product_details,'Teslimat Bilgisi':product_delivery,'Ürün Linki':product_link}
             df = df.append(satir, ignore_index=True)
-        i=i+1
-        if i == 100:
+        loop_count = loop_count - 1
+        if loop_count == 0:
             break
+    cursor.execute("delete from products")
+    db.commit()
     db.close()
     print(df)
     df.to_excel("output.xlsx") 
 
 
-#getProducts(url)
+getProductsUrl(url)
 getProductInfos()
 

@@ -17,7 +17,6 @@ class GetProductInfo:
             products = soup.findAll('script', text = re.compile('__PRODUCT_DETAIL_APP_INITIAL_STATE__'))
             pattern = '\{(?:[^{}]|(?R))*\}'
             result = regex.search(pattern, str(products[0]))[0]
-            print(result)
             self.data = json.loads(result)
 
     def control(self):
