@@ -1,4 +1,4 @@
-import requests, json, regex, os, re
+import requests, json, regex, os, re, cloudscraper
 from lxml import html
 from bs4 import BeautifulSoup
 from rich import print
@@ -8,8 +8,9 @@ class GetProductInfo:
     global data
     
     def __init__(self,link):
-        r = requests.get(link)
-        soup = BeautifulSoup(r.text, 'html.parser')
+        scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=200)
+        data = scraper.get(link).content
+        soup = BeautifulSoup(data, 'html.parser')
         nf = soup.find("h1").text
         if nf == "404":
             self.data = "Not Found"

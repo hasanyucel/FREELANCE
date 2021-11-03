@@ -5,8 +5,9 @@ import pandas as pd
 from rich import print
 
 database = 'veritabani.sqlite'
-url = "https://www.trendyol.com/sr?mid=147054"
-urun_adedi = 10
+url = "https://www.trendyol.com/sr?mid=63"
+urun_adedi = 100
+cat_or_seller = 2 #1 Cat 2 Seller
 
 def getProductsUrl(url):
     products = GetProducts(url)
@@ -15,10 +16,16 @@ def getProductsUrl(url):
     loop_count = int((urun_adedi / 24) + 1)
     urls = []
     for i in range(1,productPage+1):
-        urls.append(url+"?pi="+str(i))
+        if cat_or_seller == 1:
+            urls.append(url+"?pi="+str(i))
+        elif cat_or_seller == 2:
+            urls.append(url+"&pi="+str(i))
+        else:
+            break
         loop_count = loop_count - 1
         if loop_count == 0:
             break
+    print(urls)
     for url in urls:
         products = GetProducts(url)
         idAndUrl = products.getAllProductIdUrlToDB()
@@ -31,7 +38,7 @@ def getProductInfos():
     df = pd.DataFrame(columns=['Ürün ID','Barkod','Ürün Adı','Ürün Özellikleri','Varyant','Fiyat','Fotoğraflar','Ürün Bilgileri','Teslimat Bilgisi', 'Ürün Linki'])
     loop_count = urun_adedi
     for row in rows:
-        print(row[1])
+        #print(row[1])
         product = GetProductInfo(row[1])
         if product.control() == "Not Found":
             continue
@@ -43,7 +50,6 @@ def getProductInfos():
         product_details = product.getDetails()
         product_delivery = product.getDeliveryInformation()
         product_link = product.getProductURL()
-        print(product_attributes)
         for variant in product_variants:
             attr = variant['attributeName']+":"+variant['attributeValue']
             urun_id = product.getProductID()
