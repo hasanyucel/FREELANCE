@@ -65,8 +65,8 @@ def saveExcel(df):
     writer.sheets['modamizbir'].set_column(col_idx, col_idx, 10)
     writer.save() 
 
-#links = getLinksFromExcelFile("urun-kodlari")
-#slugs = getSlugsFromLinks(links)
+links = getLinksFromExcelFile("urun-kodlari")
+slugs = getSlugsFromLinks(links)
 #print(slugs)
-slugs = ['mavi-likrali-bayan-askili-pijama-takimi-54623','siyah-fitilli-bayan-tayt-67170','biskuvi-fitilli-bayan-tayt-67171']
+#slugs = ['mavi-likrali-bayan-askili-pijama-takimi-54623','siyah-fitilli-bayan-tayt-67170','biskuvi-fitilli-bayan-tayt-67171']
 createExcelData(slugs)
