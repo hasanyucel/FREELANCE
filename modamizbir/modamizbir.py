@@ -1,4 +1,5 @@
-import cloudscraper, json, pandas as pd
+import cloudscraper, json, pandas as pd, sys
+from os.path import exists
 from rich import print
 
 def makeHyperlink(url):
@@ -65,8 +66,18 @@ def saveExcel(df):
     writer.sheets['modamizbir'].set_column(col_idx, col_idx, 10)
     writer.save() 
 
-links = getLinksFromExcelFile("urun-kodlari")
-slugs = getSlugsFromLinks(links)
-#print(slugs)
-#slugs = ['mavi-likrali-bayan-askili-pijama-takimi-54623','siyah-fitilli-bayan-tayt-67170','biskuvi-fitilli-bayan-tayt-67171']
-createExcelData(slugs)
+f = "urun-kodlari"
+file_exists = exists(f+".xlsx")
+if (file_exists):
+    print("Uygulama çalışıyor...")
+    links = getLinksFromExcelFile(f)
+    slugs = getSlugsFromLinks(links)
+    createExcelData(slugs)
+else:
+    print(f"{f} adlı Excel dosyası bulunamadı.")
+
+def check_quit(inp):
+    if inp == 'q':
+        sys.exit(0)
+x = str(input("Lütfen çıkma için 'q' tuşuna basın: "))
+check_quit(x)
