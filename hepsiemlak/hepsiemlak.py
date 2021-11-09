@@ -32,5 +32,12 @@ def readUrlsFromTXT(path): #TXT dosyalarındaki satırları liste olarak döner.
         urls.append(line)
     return urls
 
+def getAllSaleDetailData(api_url):
+    scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=200)
+    data = scraper.get(api_url).content
+    result = json.loads(data)
+    return result
+
 #createApiUrls()
-print(readUrlsFromTXT("apis.txt"))
+#api_urls = readUrlsFromTXT("apis.txt")
+print(getAllSaleDetailData("https://www.hepsiemlak.com/api/realties/53138-8290"))
