@@ -1,4 +1,4 @@
-import cloudscraper, json, time
+import cloudscraper, json, time, unidecode
 from rich import print
 from random import randint
 
@@ -9,7 +9,7 @@ def getAllSaleData(page):
     result = json.loads(data)
     return result["realtyList"]
 
-def createApiUrl():
+def createApiUrls():
     for i in range (1,1119,1):
         sales = getAllSaleData(i)
         time.sleep(randint(1,4))
@@ -22,5 +22,15 @@ def createApiUrl():
                 api = f"https://www.hepsiemlak.com/api/realties/{listingId}"
             with open("apis.txt", "a") as myfile:
                 myfile.write(api+"\n")
-        
-createApiUrl()
+
+def readUrlsFromTXT(path): #TXT dosyalarındaki satırları liste olarak döner.
+    urls = []
+    f = open(path,'r') #'__location__+\kelime\A.txt'
+    for line in f:
+        line = unidecode.unidecode(line.strip())
+        line = line.replace(' ','').lower()
+        urls.append(line)
+    return urls
+
+#createApiUrls()
+print(readUrlsFromTXT("apis.txt"))
