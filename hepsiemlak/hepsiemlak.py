@@ -1,4 +1,5 @@
 import cloudscraper, json, time, unidecode
+from dateutil import parser
 from rich import print
 from random import randint
 
@@ -38,6 +39,36 @@ def getAllSaleDetailData(api_url):
     result = json.loads(data)
     return result
 
+def parseJsonDetails(data):
+    IlanNo = data["realtyDetail"]["listingId"]
+    IlanBasligi = data["realtyDetail"]["title"]
+    Il = data["realtyDetail"]["city"]["name"]
+    Ilce = data["realtyDetail"]["county"]["name"]
+    Mahalle = data["realtyDetail"]["district"]["name"]
+    Lat = data["realtyDetail"]["mapLocation"]["lat"]
+    Lon = data["realtyDetail"]["mapLocation"]["lon"]
+    Fiyat = str(data["realtyDetail"]["price"]) + " " + data["realtyDetail"]["currency"]
+    SonGuncellemeTarihi = data["realtyDetail"]["listingUpdatedDate"]
+    SonGuncellemeTarihi = SonGuncellemeTarihi.split('T')
+    SonGuncellemeTarihi = SonGuncellemeTarihi[0]
+    IlanDurumu = data["realtyDetail"]["category"]["typeName"]
+    KonutSekli = data["realtyDetail"]["subCategory"]["typeName"]
+    OdaSayisi = data["realtyDetail"]["roomAndLivingRoom"][0]
+    BrutNetM2 = str(data["realtyDetail"]["sqm"]["grossSqm"][0]) + " m2 / " + str(data["realtyDetail"]["sqm"]["netSqm"]) + " m2"
+    BulunduguKat = data["realtyDetail"]["floor"]["name"]
+    BinaninYasi = data["realtyDetail"]["age"]
+    IsinmaTipi = data["realtyDetail"]["heating"]["name"]
+    BinadaKatSayisi = data["realtyDetail"]["floor"]["count"]
+    KrediyeUygun = data["realtyDetail"]["credit"]["name"]
+    EsyaDurumu = data["realtyDetail"]["furnished"]
+    if EsyaDurumu:
+        EsyaDurumu = "Eşyalı"
+    else:
+        EsyaDurumu = "Eşyalı Değil"
+    BanyoSayisi = str(data["realtyDetail"]["bathRoom"])
+    print(BanyoSayisi)
+    
 #createApiUrls()
 #api_urls = readUrlsFromTXT("apis.txt")
-print(getAllSaleDetailData("https://www.hepsiemlak.com/api/realties/53138-8290"))
+data = getAllSaleDetailData("https://www.hepsiemlak.com/api/realties/111267-748")
+parseJsonDetails(data)
