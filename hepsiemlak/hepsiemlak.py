@@ -1,4 +1,5 @@
 import cloudscraper, json, time, unidecode
+from bs4 import BeautifulSoup
 from dateutil import parser
 from rich import print
 from random import randint
@@ -66,9 +67,40 @@ def parseJsonDetails(data):
     else:
         EsyaDurumu = "Eşyalı Değil"
     BanyoSayisi = str(data["realtyDetail"]["bathRoom"])
-    print(BanyoSayisi)
+    YapiTipi = data["realtyDetail"]["build"]["name"]
+    YapininDurumu = data["realtyDetail"]["buildState"]["name"]
+    KullanimDurumu = data["realtyDetail"]["usage"]["name"]
+    TapuDurumu = data["realtyDetail"]["landRegisterName"]
+    if data["realtyDetail"]["fee"] is not None:
+        Aidat = str(data["realtyDetail"]["fee"]["amount"]) + " " + data["realtyDetail"]["fee"]["currencyCode"]
+    else:
+        Aidat = "NULL"
+    if data["realtyDetail"]["barter"] is not None:
+        Takas = data["realtyDetail"]["barter"]["name"]
+    else:
+        Takas = "NULL"
+    if data["realtyDetail"]["sides"] is not None:
+        Cephe = data["realtyDetail"]["sides"]
+        Cephe = ", ".join(str(x["name"]) for x in Cephe)
+    else:
+        Cephe = "NULL"
+    if data["realtyDetail"]["housingComplex"] is not None:
+        SiteIcerisinde = data["realtyDetail"]["housingComplex"]["name"]
+    else:
+        SiteIcerisinde = "NULL"
+    KiraGetirisi = str(data["realtyDetail"]["rental"]["amount"]) + " " + data["realtyDetail"]["rental"]["currencyCode"]
+    YakitTipi = data["realtyDetail"]["fuel"]["name"]
+    if data["realtyDetail"]["authorizedRealtor"] is not None:
+        YetkiliOfis = data["realtyDetail"]["authorizedRealtor"]
+    else:
+        YetkiliOfis = "NULL"
+    GoruntuluArama = data["realtyDetail"]["onlineVisit"]
+    IlanAciklamasıHTML = data["realtyDetail"]["description"]
+    IlanAciklaması = BeautifulSoup(IlanAciklamasıHTML, "lxml").text.strip()
+    Link = data["realtyDetail"]["detailUrl"]
+    print(Link)
     
 #createApiUrls()
 #api_urls = readUrlsFromTXT("apis.txt")
-data = getAllSaleDetailData("https://www.hepsiemlak.com/api/realties/111267-748")
+data = getAllSaleDetailData("https://www.hepsiemlak.com/api/realties/4180-8445")
 parseJsonDetails(data)
