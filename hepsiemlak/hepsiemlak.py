@@ -49,6 +49,22 @@ def insertAttribute(atid,name,table):
     conn.commit()
     conn.close()
 
+def insertSaleData(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
+        IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
+            KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
+                Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklamasi):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute(f"INSERT OR REPLACE INTO sales (IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
+        IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
+            KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
+                Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,Attrs1,Attrs2,Attrs3,Url,Aciklama) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
+        IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
+            KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
+                Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklamasi))
+    conn.commit()
+    conn.close()
+
 def parseJsonDetails(data):
     IlanNo = data["realtyDetail"]["listingId"]
     IlanBasligi = data["realtyDetail"]["title"]
@@ -104,8 +120,8 @@ def parseJsonDetails(data):
     else:
         YetkiliOfis = "NULL"
     GoruntuluArama = data["realtyDetail"]["onlineVisit"]
-    IlanAciklamasıHTML = data["realtyDetail"]["description"]
-    IlanAciklaması = BeautifulSoup(IlanAciklamasıHTML, "lxml").text.strip()
+    IlanAciklamasiHTML = data["realtyDetail"]["description"]
+    IlanAciklamasi = BeautifulSoup(IlanAciklamasiHTML, "lxml").text.strip()
     Link = "https://www.hepsiemlak.com/"+data["realtyDetail"]["detailUrl"]
     attrs1 = data["realtyDetail"]["attributes"]["inAttributes"]
     at1 = ",".join(str(x["id"]) for x in attrs1)
@@ -119,10 +135,10 @@ def parseJsonDetails(data):
     at3 = ",".join(str(x["id"]) for x in attrs3)
     for at in attrs3:
         insertAttribute(str(at["id"]),at["name"],"ozellik3")
-    print(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
+    insertSaleData(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
         IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
             KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
-                Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklaması)
+                Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklamasi)
     
 #createApiUrls()
 #api_urls = readUrlsFromTXT("apis.txt")
