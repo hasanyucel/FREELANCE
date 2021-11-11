@@ -21,7 +21,7 @@ def createApiUrls():
             proje = sale["projeland"]
             listingId = sale["listingId"]
             if proje:
-                api = f"https://www.hepsiemlak.com/api/proje/projeland_{listingId}"
+                api = f"https://www.hepsiemlak.com/api/proje/projeland_{listingId}" #continue
             else:
                 api = f"https://www.hepsiemlak.com/api/realties/{listingId}"
             with open("apis.txt", "a") as myfile:
@@ -39,8 +39,11 @@ def readUrlsFromTXT(path): #TXT dosyalarındaki satırları liste olarak döner.
 def getAllSaleDetailData(api_url):
     scraper = cloudscraper.create_scraper(browser={'browser': 'firefox','platform': 'windows','mobile': False},delay=200)
     data = scraper.get(api_url).content
-    result = json.loads(data)
-    return result
+    if data == b'':
+        return "-"
+    else:
+        result = json.loads(data)
+        return result
 
 def insertAttribute(atid,name,table):
     conn = sqlite3.connect(db)
@@ -66,81 +69,128 @@ def insertSaleData(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellem
     conn.close()
 
 def parseJsonDetails(data):
-    IlanNo = data["realtyDetail"]["listingId"]
-    IlanBasligi = data["realtyDetail"]["title"]
-    Il = data["realtyDetail"]["city"]["name"]
-    Ilce = data["realtyDetail"]["county"]["name"]
-    Mahalle = data["realtyDetail"]["district"]["name"]
-    Lat = data["realtyDetail"]["mapLocation"]["lat"]
-    Lon = data["realtyDetail"]["mapLocation"]["lon"]
-    Fiyat = str(data["realtyDetail"]["price"]) + " " + data["realtyDetail"]["currency"]
-    SonGuncellemeTarihi = data["realtyDetail"]["listingUpdatedDate"]
-    SonGuncellemeTarihi = SonGuncellemeTarihi.split('T')
-    SonGuncellemeTarihi = SonGuncellemeTarihi[0]
-    IlanDurumu = data["realtyDetail"]["category"]["typeName"]
-    KonutSekli = data["realtyDetail"]["subCategory"]["typeName"]
-    OdaSayisi = data["realtyDetail"]["roomAndLivingRoom"][0]
-    BrutNetM2 = str(data["realtyDetail"]["sqm"]["grossSqm"][0]) + " m2 / " + str(data["realtyDetail"]["sqm"]["netSqm"]) + " m2"
-    BulunduguKat = data["realtyDetail"]["floor"]["name"]
-    BinaninYasi = data["realtyDetail"]["age"]
-    IsinmaTipi = data["realtyDetail"]["heating"]["name"]
-    BinadaKatSayisi = data["realtyDetail"]["floor"]["count"]
-    KrediyeUygun = data["realtyDetail"]["credit"]["name"]
-    EsyaDurumu = data["realtyDetail"]["furnished"]
-    if EsyaDurumu:
-        EsyaDurumu = "Eşyalı"
-    else:
-        EsyaDurumu = "Eşyalı Değil"
-    BanyoSayisi = str(data["realtyDetail"]["bathRoom"])
-    YapiTipi = data["realtyDetail"]["build"]["name"]
-    YapininDurumu = data["realtyDetail"]["buildState"]["name"]
-    KullanimDurumu = data["realtyDetail"]["usage"]["name"]
-    TapuDurumu = data["realtyDetail"]["landRegisterName"]
-    if data["realtyDetail"]["fee"] is not None:
-        Aidat = str(data["realtyDetail"]["fee"]["amount"]) + " " + data["realtyDetail"]["fee"]["currencyCode"]
-    else:
-        Aidat = "NULL"
-    if data["realtyDetail"]["barter"] is not None:
-        Takas = data["realtyDetail"]["barter"]["name"]
-    else:
-        Takas = "NULL"
-    if data["realtyDetail"]["sides"] is not None:
-        Cephe = data["realtyDetail"]["sides"]
-        Cephe = ", ".join(str(x["name"]) for x in Cephe)
-    else:
-        Cephe = "NULL"
-    if data["realtyDetail"]["housingComplex"] is not None:
-        SiteIcerisinde = data["realtyDetail"]["housingComplex"]["name"]
-    else:
-        SiteIcerisinde = "NULL"
-    KiraGetirisi = str(data["realtyDetail"]["rental"]["amount"]) + " " + data["realtyDetail"]["rental"]["currencyCode"]
-    YakitTipi = data["realtyDetail"]["fuel"]["name"]
-    if data["realtyDetail"]["authorizedRealtor"] is not None:
-        YetkiliOfis = data["realtyDetail"]["authorizedRealtor"]
-    else:
-        YetkiliOfis = "NULL"
-    GoruntuluArama = data["realtyDetail"]["onlineVisit"]
-    IlanAciklamasiHTML = data["realtyDetail"]["description"]
-    IlanAciklamasi = BeautifulSoup(IlanAciklamasiHTML, "lxml").text.strip()
-    Link = "https://www.hepsiemlak.com/"+data["realtyDetail"]["detailUrl"]
-    attrs1 = data["realtyDetail"]["attributes"]["inAttributes"]
-    at1 = ",".join(str(x["id"]) for x in attrs1)
-    for at in attrs1:
-        insertAttribute(str(at["id"]),at["name"],"ozellik1")
-    attrs2 = data["realtyDetail"]["attributes"]["outAttributes"]
-    at2 = ",".join(str(x["id"]) for x in attrs2)
-    for at in attrs2:
-        insertAttribute(str(at["id"]),at["name"],"ozellik2")
-    attrs3 = data["realtyDetail"]["attributes"]["locationAttributes"]
-    at3 = ",".join(str(x["id"]) for x in attrs3)
-    for at in attrs3:
-        insertAttribute(str(at["id"]),at["name"],"ozellik3")
-    insertSaleData(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
-        IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
-            KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
-                Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklamasi)
+    if data != "-":
+        IlanNo = data["realtyDetail"]["listingId"]
+        IlanBasligi = data["realtyDetail"]["title"]
+        Il = data["realtyDetail"]["city"]["name"]
+        Ilce = data["realtyDetail"]["county"]["name"]
+        Mahalle = data["realtyDetail"]["district"]["name"]
+        Lat = data["realtyDetail"]["mapLocation"]["lat"]
+        Lon = data["realtyDetail"]["mapLocation"]["lon"]
+        Fiyat = str(data["realtyDetail"]["price"]) + " " + data["realtyDetail"]["currency"]
+        SonGuncellemeTarihi = data["realtyDetail"]["listingUpdatedDate"]
+        SonGuncellemeTarihi = SonGuncellemeTarihi.split('T')
+        SonGuncellemeTarihi = SonGuncellemeTarihi[0]
+        IlanDurumu = data["realtyDetail"]["category"]["typeName"]
+        KonutSekli = data["realtyDetail"]["subCategory"]["typeName"]
+        OdaSayisi = data["realtyDetail"]["roomAndLivingRoom"][0]
+        BrutNetM2 = str(data["realtyDetail"]["sqm"]["grossSqm"][0]) + " m2 / " + str(data["realtyDetail"]["sqm"]["netSqm"]) + " m2"
+        BulunduguKat = data["realtyDetail"]["floor"]["name"]
+        BinaninYasi = data["realtyDetail"]["age"]
+        if data["realtyDetail"]["heating"] is not None:
+            IsinmaTipi = data["realtyDetail"]["heating"]["name"]
+        else:
+            IsinmaTipi = "NULL" 
+        if data["realtyDetail"]["floor"] is not None:
+            BinadaKatSayisi = data["realtyDetail"]["floor"]["count"]
+        else:
+            BinadaKatSayisi = "NULL"    
+        if data["realtyDetail"]["credit"] is not None:
+            KrediyeUygun = data["realtyDetail"]["credit"]["name"]
+        else:
+            KrediyeUygun = "NULL" 
+        if data["realtyDetail"]["furnished"] is not None:
+            EsyaDurumu = data["realtyDetail"]["furnished"]
+        else:
+            EsyaDurumu = "NULL" 
+        if EsyaDurumu:
+            EsyaDurumu = "Eşyalı"
+        else:
+            EsyaDurumu = "Eşyalı Değil"
+        if data["realtyDetail"]["bathRoom"] is not None:
+            BanyoSayisi = str(data["realtyDetail"]["bathRoom"])
+        else:
+            BanyoSayisi = "NULL" 
+        if data["realtyDetail"]["build"] is not None:
+            YapiTipi = data["realtyDetail"]["build"]["name"]
+        else:
+            YapiTipi = "NULL"
+        if data["realtyDetail"]["buildState"] is not None:
+            YapininDurumu = data["realtyDetail"]["buildState"]["name"]
+        else:
+            YapininDurumu = "NULL"
+        if data["realtyDetail"]["usage"] is not None:
+            KullanimDurumu = data["realtyDetail"]["usage"]["name"]
+        else:
+            KullanimDurumu = "NULL"
+        if data["realtyDetail"]["landRegisterName"] is not None:
+            TapuDurumu = data["realtyDetail"]["landRegisterName"]
+        else:
+            TapuDurumu = "NULL"
+        if data["realtyDetail"]["fee"] is not None:
+            Aidat = str(data["realtyDetail"]["fee"]["amount"]) + " " + data["realtyDetail"]["fee"]["currencyCode"]
+        else:
+            Aidat = "NULL"
+        if data["realtyDetail"]["barter"] is not None:
+            Takas = data["realtyDetail"]["barter"]["name"]
+        else:
+            Takas = "NULL"
+        if data["realtyDetail"]["sides"] is not None:
+            Cephe = data["realtyDetail"]["sides"]
+            Cephe = ", ".join(str(x["name"]) for x in Cephe)
+        else:
+            Cephe = "NULL"
+        if data["realtyDetail"]["housingComplex"] is not None:
+            SiteIcerisinde = data["realtyDetail"]["housingComplex"]["name"]
+        else:
+            SiteIcerisinde = "NULL"
+        if data["realtyDetail"]["rental"] is not None:
+            KiraGetirisi = str(data["realtyDetail"]["rental"]["amount"]) + " " + data["realtyDetail"]["rental"]["currencyCode"]
+        else:
+            KiraGetirisi = "NULL"
+        if data["realtyDetail"]["fuel"] is not None:
+            YakitTipi = data["realtyDetail"]["fuel"]["name"]
+        else:
+            YakitTipi = "NULL"
+        if data["realtyDetail"]["authorizedRealtor"] is not None:
+            YetkiliOfis = data["realtyDetail"]["authorizedRealtor"]
+        else:
+            YetkiliOfis = "NULL"
+        if data["realtyDetail"]["onlineVisit"] is not None:
+            GoruntuluArama = data["realtyDetail"]["onlineVisit"]
+        else:
+            GoruntuluArama = "NULL"  
+        if data["realtyDetail"]["description"] is not None:
+            IlanAciklamasiHTML = data["realtyDetail"]["description"]
+            IlanAciklamasi = BeautifulSoup(IlanAciklamasiHTML, "lxml").text.strip()
+        else:
+            IlanAciklamasi = "NULL"
+        Link = "https://www.hepsiemlak.com/"+data["realtyDetail"]["detailUrl"]
+        if data["realtyDetail"]["attributes"] is not None:
+            attrs1 = data["realtyDetail"]["attributes"]["inAttributes"]
+            at1 = ",".join(str(x["id"]) for x in attrs1)
+            for at in attrs1:
+                insertAttribute(str(at["id"]),at["name"],"ozellik1")
+            attrs2 = data["realtyDetail"]["attributes"]["outAttributes"]
+            at2 = ",".join(str(x["id"]) for x in attrs2)
+            for at in attrs2:
+                insertAttribute(str(at["id"]),at["name"],"ozellik2")
+            attrs3 = data["realtyDetail"]["attributes"]["locationAttributes"]
+            at3 = ",".join(str(x["id"]) for x in attrs3)
+            for at in attrs3:
+                insertAttribute(str(at["id"]),at["name"],"ozellik3")
+        else:
+            at1 = "NULL"
+            at2 = "NULL"
+            at3 = "NULL"
+        insertSaleData(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
+            IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
+                KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
+                    Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklamasi)
     
 #createApiUrls()
-#api_urls = readUrlsFromTXT("apis.txt")
-data = getAllSaleDetailData("https://www.hepsiemlak.com/api/realties/4180-8445")
-parseJsonDetails(data)
+api_urls = readUrlsFromTXT("test.txt")
+for url in api_urls:
+    print(url)
+    data = getAllSaleDetailData(url)
+    parseJsonDetails(data)
