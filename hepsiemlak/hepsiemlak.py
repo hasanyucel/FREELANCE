@@ -106,7 +106,7 @@ def parseJsonDetails(data):
     GoruntuluArama = data["realtyDetail"]["onlineVisit"]
     IlanAciklamasıHTML = data["realtyDetail"]["description"]
     IlanAciklaması = BeautifulSoup(IlanAciklamasıHTML, "lxml").text.strip()
-    Link = data["realtyDetail"]["detailUrl"]
+    Link = "https://www.hepsiemlak.com/"+data["realtyDetail"]["detailUrl"]
     attrs1 = data["realtyDetail"]["attributes"]["inAttributes"]
     at1 = ",".join(str(x["id"]) for x in attrs1)
     for at in attrs1:
