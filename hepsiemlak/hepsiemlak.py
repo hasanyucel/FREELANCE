@@ -1,8 +1,10 @@
-import cloudscraper, json, time, unidecode
+import cloudscraper, json, time, unidecode, sqlite3
 from bs4 import BeautifulSoup
 from dateutil import parser
 from rich import print
 from random import randint
+
+db = "hepsiemlak.sqlite"
 
 def getAllSaleData(page):
     url = f"https://www.hepsiemlak.com/api/realty-list/ankara-satilik?page={page}&fillIntentUrls=false"
@@ -39,6 +41,13 @@ def getAllSaleDetailData(api_url):
     data = scraper.get(api_url).content
     result = json.loads(data)
     return result
+
+def insertAttribute(atid,name,table):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute(f"INSERT OR IGNORE INTO {table} (Id,Tanim) VALUES (?,?)",(atid,name))
+    conn.commit()
+    conn.close()
 
 def parseJsonDetails(data):
     IlanNo = data["realtyDetail"]["listingId"]
@@ -98,7 +107,22 @@ def parseJsonDetails(data):
     IlanAciklamasıHTML = data["realtyDetail"]["description"]
     IlanAciklaması = BeautifulSoup(IlanAciklamasıHTML, "lxml").text.strip()
     Link = data["realtyDetail"]["detailUrl"]
-    print(Link)
+    attrs1 = data["realtyDetail"]["attributes"]["inAttributes"]
+    at1 = ",".join(str(x["id"]) for x in attrs1)
+    for at in attrs1:
+        insertAttribute(str(at["id"]),at["name"],"ozellik1")
+    attrs2 = data["realtyDetail"]["attributes"]["outAttributes"]
+    at2 = ",".join(str(x["id"]) for x in attrs2)
+    for at in attrs2:
+        insertAttribute(str(at["id"]),at["name"],"ozellik2")
+    attrs3 = data["realtyDetail"]["attributes"]["locationAttributes"]
+    at3 = ",".join(str(x["id"]) for x in attrs3)
+    for at in attrs3:
+        insertAttribute(str(at["id"]),at["name"],"ozellik3")
+    print(IlanBasligi,Il,Ilce,Mahalle,Lon,Lat,Fiyat,IlanNo,SonGuncellemeTarihi,\
+        IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
+            KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
+                Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklaması)
     
 #createApiUrls()
 #api_urls = readUrlsFromTXT("apis.txt")
