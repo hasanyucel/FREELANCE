@@ -85,8 +85,14 @@ def parseJsonDetails(data):
         KonutSekli = data["realtyDetail"]["subCategory"]["typeName"]
         OdaSayisi = data["realtyDetail"]["roomAndLivingRoom"][0]
         BrutNetM2 = str(data["realtyDetail"]["sqm"]["grossSqm"][0]) + " m2 / " + str(data["realtyDetail"]["sqm"]["netSqm"]) + " m2"
-        BulunduguKat = data["realtyDetail"]["floor"]["name"]
-        BinaninYasi = data["realtyDetail"]["age"]
+        if data["realtyDetail"]["floor"] is not None:
+            BulunduguKat = data["realtyDetail"]["floor"]["name"]
+        else:
+            BulunduguKat = "NULL" 
+        if data["realtyDetail"]["age"] is not None:
+            BinaninYasi = data["realtyDetail"]["age"]
+        else:
+            BinaninYasi = "NULL"
         if data["realtyDetail"]["heating"] is not None:
             IsinmaTipi = data["realtyDetail"]["heating"]["name"]
         else:
@@ -145,7 +151,10 @@ def parseJsonDetails(data):
         else:
             SiteIcerisinde = "NULL"
         if data["realtyDetail"]["rental"] is not None:
-            KiraGetirisi = str(data["realtyDetail"]["rental"]["amount"]) + " " + data["realtyDetail"]["rental"]["currencyCode"]
+            if data["realtyDetail"]["rental"]["currencyCode"] is not None:
+                KiraGetirisi = str(data["realtyDetail"]["rental"]["amount"]) + " " + data["realtyDetail"]["rental"]["currencyCode"]
+            else:
+                KiraGetirisi = "NULL"
         else:
             KiraGetirisi = "NULL"
         if data["realtyDetail"]["fuel"] is not None:
@@ -189,8 +198,9 @@ def parseJsonDetails(data):
                     Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklamasi)
     
 #createApiUrls()
-api_urls = readUrlsFromTXT("test.txt")
+api_urls = readUrlsFromTXT("apis.txt")
 for url in api_urls:
+    time.sleep(randint(3,5))
     print(url)
     data = getAllSaleDetailData(url)
     parseJsonDetails(data)
