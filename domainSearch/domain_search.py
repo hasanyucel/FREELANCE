@@ -83,7 +83,7 @@ def main():
     #    domains = readDomainsFromTXT(txt)
     #    print(domains)
     #    checkDomains(username,token,domains,db_name,table_name)
-    for i in range(10):
+    for i in range(100):
         domains = createRandomDomainList(5)
         checkDomains(username,token,domains,db_name,table_name)
 

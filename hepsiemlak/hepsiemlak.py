@@ -134,7 +134,13 @@ def parseJsonDetails(data):
         else:
             TapuDurumu = "NULL"
         if data["realtyDetail"]["fee"] is not None:
-            Aidat = str(data["realtyDetail"]["fee"]["amount"]) + " " + data["realtyDetail"]["fee"]["currencyCode"]
+            if data["realtyDetail"]["fee"]["amount"] is not None:
+                if data["realtyDetail"]["fee"]["currencyCode"] is not None:
+                    Aidat = str(data["realtyDetail"]["fee"]["amount"]) + " " + data["realtyDetail"]["fee"]["currencyCode"]
+                else:
+                    Aidat = "NULL"
+            else:
+                Aidat = "NULL"
         else:
             Aidat = "NULL"
         if data["realtyDetail"]["barter"] is not None:
@@ -196,11 +202,22 @@ def parseJsonDetails(data):
             IlanDurumu,KonutSekli,OdaSayisi,BrutNetM2,BulunduguKat,BinaninYasi,IsinmaTipi,BinadaKatSayisi,\
                 KrediyeUygun,EsyaDurumu,BanyoSayisi,YapiTipi,YapininDurumu,KullanimDurumu,TapuDurumu,Aidat,Takas,\
                     Cephe,SiteIcerisinde,KiraGetirisi,YakitTipi,YetkiliOfis,GoruntuluArama,at1,at2,at3,Link,IlanAciklamasi)
-    
-#createApiUrls()
+
+def insertIlanNos(table_name):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute(f'select IlanNo from sales')
+    links = cur.fetchall()
+    for f in links:
+        cur.execute(f"INSERT OR REPLACE INTO {table_name} (IlanNo) VALUES (?)",(f[0],))
+    conn.commit()
+    conn.close()
+
+"""createApiUrls()
 api_urls = readUrlsFromTXT("apis.txt")
 for url in api_urls:
-    time.sleep(randint(3,5))
+    time.sleep(randint(1,3))
     print(url)
     data = getAllSaleDetailData(url)
-    parseJsonDetails(data)
+    parseJsonDetails(data)"""
+#insertIlanNos("konum")
