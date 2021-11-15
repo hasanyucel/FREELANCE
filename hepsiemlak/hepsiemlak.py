@@ -213,6 +213,19 @@ def insertIlanNos(table_name):
     conn.commit()
     conn.close()
 
+def fillAttrs(attr,table_name):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    cur.execute(f'select IlanNo,{attr} from sales')
+    links = cur.fetchall()
+    for f in links:
+        if f[1] != "" and f[1] != "NULL":
+            print(f)
+            x = f[1].split(",")
+            for at in x:
+                cur.execute(f"UPDATE {table_name} set '{at}' = 'VAR' where IlanNo = '{f[0]}'")
+            conn.commit()
+    conn.close()
 """createApiUrls()
 api_urls = readUrlsFromTXT("apis.txt")
 for url in api_urls:
@@ -221,3 +234,4 @@ for url in api_urls:
     data = getAllSaleDetailData(url)
     parseJsonDetails(data)"""
 #insertIlanNos("konum")
+fillAttrs("Attrs1","icOzellikler")
