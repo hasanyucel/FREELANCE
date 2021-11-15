@@ -234,4 +234,4 @@ for url in api_urls:
     data = getAllSaleDetailData(url)
     parseJsonDetails(data)"""
 #insertIlanNos("konum")
-fillAttrs("Attrs1","icOzellikler")
+fillAttrs("Attrs3","konum")
