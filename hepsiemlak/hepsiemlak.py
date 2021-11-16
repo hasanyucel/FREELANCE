@@ -1,4 +1,4 @@
-import cloudscraper, json, time, unidecode, sqlite3
+import cloudscraper, json, time, unidecode, sqlite3, pandas as pd
 from bs4 import BeautifulSoup
 from dateutil import parser
 from rich import print
@@ -226,6 +226,24 @@ def fillAttrs(attr,table_name):
                 cur.execute(f"UPDATE {table_name} set '{at}' = 'VAR' where IlanNo = '{f[0]}'")
             conn.commit()
     conn.close()
+
+def makeHyperlink(url):
+    return f'=Hyperlink("{url}","İlan")'
+
+def makeLocationHyperlink(lat,lon):
+    return f'=Hyperlink("http://www.google.com/maps/place/{lat},{lon}","Konum")'
+
+def getPivotSales():
+    conn = sqlite3.connect(db)
+    df = pd.read_sql_query("SELECT s.*,i.*,d.*,k.* from sales s, icOzellikler i, disOzellikler d, konum k WHERE s.IlanNo = i.IlanNo AND s.IlanNo = d.IlanNo AND s.IlanNo = k.IlanNo", conn)
+    df = pd.DataFrame(df)
+    df['Url'] = df.apply(lambda row : makeHyperlink(row['Url']), axis = 1)
+    df['Konum'] = df.apply(lambda row : makeLocationHyperlink(row['Lat'],row['Lon']), axis = 1)
+    print(df)
+    writer = pd.ExcelWriter('hepsiEmlak.xlsx')
+    df.to_excel(writer,sheet_name ='Emlak')
+    writer.save()
+    conn.close()
 """createApiUrls()
 api_urls = readUrlsFromTXT("apis.txt")
 for url in api_urls:
@@ -234,4 +252,5 @@ for url in api_urls:
     data = getAllSaleDetailData(url)
     parseJsonDetails(data)"""
 #insertIlanNos("konum")
-fillAttrs("Attrs3","konum")
+#fillAttrs("Attrs3","konum")
+getPivotSales()
