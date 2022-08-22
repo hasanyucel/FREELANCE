@@ -12,5 +12,13 @@ def createDbAndTables():
     conn.commit()
     conn.close()
 
+def getAllProductData(pcount):
+    url = f"https://camkirangaraj.com/products/?from=0&json=true&to={pcount}"
+    scraper = requests.get(url)
+    data = scraper.content
+    result = json.loads(data)
+    return result
 
 createDbAndTables()
+productData = getAllProductData(10)
+print(productData)
