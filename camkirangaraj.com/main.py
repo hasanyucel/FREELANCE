@@ -17,6 +17,7 @@ def getProductData(pcount):
     scraper = requests.get(url)
     data = scraper.content
     result = json.loads(data)
+    print(result)
     return result
 
 def parseProductData(pcount):
@@ -26,7 +27,7 @@ def parseProductData(pcount):
     
     for product in productData:
         productID = product["ProductId"]
-        productLink = "https://camkirangaraj.com/"+product["Url"]
+        productLink = "https://camkirangaraj.com"+product["Url"]
         productName = product["Name"]
         productCode = product["ProductStokcCode"]
         productPrice = product["Price"]
@@ -37,5 +38,5 @@ def parseProductData(pcount):
 
 
 createDbAndTables()
-parseProductData(5)
+parseProductData(2825)
 
