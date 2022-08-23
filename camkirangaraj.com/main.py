@@ -12,13 +12,30 @@ def createDbAndTables():
     conn.commit()
     conn.close()
 
-def getAllProductData(pcount):
+def getProductData(pcount):
     url = f"https://camkirangaraj.com/products/?from=0&json=true&to={pcount}"
     scraper = requests.get(url)
     data = scraper.content
     result = json.loads(data)
     return result
 
+def parseProductData(pcount):
+    conn = sqlite3.connect(db)
+    cur = conn.cursor()
+    productData = getProductData(pcount)[0]["Products"]
+    
+    for product in productData:
+        productID = product["ProductId"]
+        productLink = "https://camkirangaraj.com/"+product["Url"]
+        productName = product["Name"]
+        productCode = product["ProductStokcCode"]
+        productPrice = product["Price"]
+        print(productID,productLink,productName,productCode,productPrice)
+        cur.execute("INSERT OR REPLACE INTO Urunler (UrunId,Link,UrunAdi,UrunKodu,Fiyat) VALUES (?,?,?,?,?)",(productID,productLink,productName,productCode,productPrice))
+        conn.commit()
+    conn.close()
+
+
 createDbAndTables()
-productData = getAllProductData(10)
-print(productData)
+parseProductData(5)
+
