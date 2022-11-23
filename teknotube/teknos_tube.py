@@ -3,11 +3,22 @@ from tkinter import ttk
 from tkinter import filedialog
 from pytube import YouTube
 from PIL import ImageTk, Image
-import os
+import os,sys,win32gui, win32con
+
+#the_program_to_hide = win32gui.GetForegroundWindow()
+#win32gui.ShowWindow(the_program_to_hide , win32con.SW_HIDE)
 
 KlasorAdi = ""
 labelBg = "#dcdcdc"
 labelFg = "black"
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def KlasorSec():
         global KlasorAdi
@@ -53,7 +64,7 @@ root.resizable(False,False)
 root.geometry('700x500')
 
 # Load the image
-image=Image.open('1.jpg')
+image=Image.open(resource_path('1.jpg'))
 img=image.resize((320, 88))
 my_img=ImageTk.PhotoImage(img)
 label=Label(root, image=my_img)
