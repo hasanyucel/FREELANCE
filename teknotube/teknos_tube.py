@@ -60,6 +60,7 @@ root = Tk()
 root.title("Youtube Video İndirici - Teknostube")    
 root.grid_columnconfigure(0, weight=1)  #strech things Horiontally
 root.configure(background='#dcdcdc')
+root.iconbitmap(resource_path("1.ico"))
 root.resizable(False,False)
 root.geometry('700x500')
 
