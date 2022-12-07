@@ -1,4 +1,4 @@
-import cloudscraper
+import cloudscraper,sqlite3
 from rich import print
 from bs4 import BeautifulSoup
 
