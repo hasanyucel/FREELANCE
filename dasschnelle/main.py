@@ -92,15 +92,21 @@ def getIdentityDetails(link):
         addressCountry = json_object["address"]["addressCountry"]
     else:
         addressCountry = '-'
+
+    if  'geo' in json_object:    
+
+        if  'latitude' in json_object["geo"]:
+            latitude = json_object["geo"]["latitude"]
+        else:
+            latitude = '-'
+
+        if  'longitude'in json_object["geo"]:
+            longitude = json_object["geo"]["longitude"]
+        else:
+            longitude = '-'
     
-    if  'latitude' in json_object["geo"]:
-        latitude = json_object["geo"]["latitude"]
     else:
         latitude = '-'
-
-    if  'longitude'in json_object["geo"]:
-        longitude = json_object["geo"]["longitude"]
-    else:
         longitude = '-'
     
     if  'telephone' in json_object:
@@ -112,6 +118,8 @@ def getIdentityDetails(link):
 
     if  'faxNumber' in json_object:
         faxNumber = json_object["faxNumber"]
+        if type(faxNumber) is list:
+            faxNumber = ';'.join(faxNumber)
     else:
         faxNumber = '-'
 
@@ -164,7 +172,7 @@ def getIdentityDetails(link):
     #print('urls : ',urls)
     #print('logo : ',logo)
     #print('images : ',images)
-    #print('priceRange : ',priceRange)
+    print('priceRange : ',priceRange)
 
 print("Script is working...")
 t0 = time.time()
@@ -175,104 +183,26 @@ t0 = time.time()
 #urls = getTableColumn('SiteMapLinks','Url')
 #for url in urls: 
 #    insertAllLinks(url,'SiteLinks')
-error_links = []
-counter = 1
-urls = getTableColumn('SiteLinks','Url')
-
-for url in urls:
-    if counter % 20 == 0:
-        sleep(120)
-    try:
-        print(counter, url)
-        getIdentityDetails(url)
-        counter+=1
-    except:
-        print('ERROR -------- ',url)
-        error_links.append(url)
-        pass
-
-print(error_links)
-#while len(error_links) == 0:
+#error_links = []
+#counter = 1
+#urls = getTableColumn('SiteLinks','Url')
 #
-#    for url in error_links:
-#        if counter % 20 == 0:
-#            sleep(120)
-#        try:
-#            print(counter, url)
-#            getIdentityDetails(url)
-#            error_links.remove(url)
-#            counter+=1
-#        except:
-#            error_links.append(url)
-#            pass
+#for url in urls:
+#    if counter % 20 == 0:
+#        sleep(120)
+#    try:
+#        print(counter, url)
+#        getIdentityDetails(url)
+#        counter+=1
+#    except:
+#        print('ERROR -------- ',url)
+#        error_links.append(url)
+#        pass
+#
+#print(error_links)
 
-
-#getIdentityDetails('https://www.dasschnelle.at/reinisch-gesmbh-feldbach-mühldorfer-straße') #https://www.dasschnelle.at/blumen-egerth-exenberger-renate-kufstein-gewerbehof
+#for link in error_links:
+#    getIdentityDetails(link) #https://www.dasschnelle.at/blumen-egerth-exenberger-renate-kufstein-gewerbehof
 
 t1 = time.time()
 print(f"{t1-t0} seconds.")
-
-
-#    'https://www.dasschnelle.at/stadtgemeinde-baden-baden-hauptplatz',
-#    'https://www.dasschnelle.at/mag-claudia-schmidt-psychotherapeutin-i-a-u-s-bad-ischl-wiesingerstraße',
-#    'https://www.dasschnelle.at/freizeitanlage-schlögen-e-u-pächter-andrea-winkler-moos-mitterberg',
-#    'https://www.dasschnelle.at/saringer-gmbh-schwaz-gewerbepark-einfang',
-#    'https://www.dasschnelle.at/rauch-steuerberatung-gesmbh-steinach-zirmweg',
-#    'https://www.dasschnelle.at/a-hechenblaikner-versicherungsmakler-gmbh-reutte-planseestraße',
-#    'https://www.dasschnelle.at/haselsberger-markus-lähn-unterdorf',
-#    'https://www.dasschnelle.at/entfeuchtungstechnik-gruber-breitenwang-unterried',
-#    'https://www.dasschnelle.at/wegmann-wolfgang-dr-ehrwald-kirchplatz',
-#    'https://www.dasschnelle.at/unser-lagerhaus-warenhandelsgesmbh-ötztal-bahnhof-handelsweg',
-#    'https://www.dasschnelle.at/hassel-peter-ötztal-bahnhof-bahnrain',
-#    'https://www.dasschnelle.at/architec-zt-gesmbh-wolfsberg-johann-offner-straße',
-#    'https://www.dasschnelle.at/schneeberger-gmbh-atzbach-hauptstraße',
-#    'https://www.dasschnelle.at/hölblinger-und-zefferer-hoch-u-tiefbau-gesmbh-mariazell-bundesstraße',
-#    'https://www.dasschnelle.at/stadtgemeinde-bruck-an-der-mur-bruck-an-der-mur-koloman-wallisch-platz',
-#    'https://www.dasschnelle.at/kaiblinger-rechtsanwalts-gmbh-gunskirchen-marktplatz',
-#    'https://www.dasschnelle.at/umlauft-schuhhaus-neumarkt-am-wallersee-hauptstraße',
-#    'https://www.dasschnelle.at/apotheke-st-mang-füssen-reichenstr',
-#    'https://www.dasschnelle.at/ausbildungszentrum-braunau-braunau-industriezeile',
-#    'https://www.dasschnelle.at/hohner-sabrina-traun-hauptplatz',
-#    'https://www.dasschnelle.at/schloss-traun-traun-schlossstraße',
-#    'https://www.dasschnelle.at/tscharnuter-bau-gmbh-verputzarbeiten-ehrwald-schanz',
-#    'https://www.dasschnelle.at/mobile-säge-florian-haas-kitzbühel-fichterfeld',
-#    'https://www.dasschnelle.at/nagler-bau-gmbh-ternberg-dürnbachstraße',
-#    'https://www.dasschnelle.at/as-installationen-braunau-am-inn-mattighofner-straße',
-#    'https://www.dasschnelle.at/arnaut-alma-braunau-am-inn-mattighofner-straße',
-#    'https://www.dasschnelle.at/check-er-fitness-gmbh-simbach-kreuzberger-weg',
-#    'https://www.dasschnelle.at/schmidhammer-wolfgang-salzburg-vogelweiderstraße',
-#    'https://www.dasschnelle.at/kink-erich-baden-kaiser-franz-joseph-ring',
-#    'https://www.dasschnelle.at/stadtgemeinde-baden-baden-neustiftgasse',
-#    'https://www.dasschnelle.at/ahammer-karl-altmünster-maria-theresiastr',
-#    'https://www.dasschnelle.at/frauenhaus-ried-ried-im-innkreis-postfach',
-#    'https://www.dasschnelle.at/pacher-wolfgang-gmünd-dornbach',
-#    'https://www.dasschnelle.at/leitner-günter-öhling-im-reith',
-#    'https://www.dasschnelle.at/haider-klemens-dr-attnang-puchheim-römerstraße',
-#    'https://www.dasschnelle.at/kaspar-gudrun-dr-klosterneuburg-hauptstraße',
-#    'https://www.dasschnelle.at/strauss-c-dr-vöcklamarkt-hauptstraße',
-#    'https://www.dasschnelle.at/der-steinacher-ramsau-hoferstraße',
-#    'https://www.dasschnelle.at/ddr-peter-zwittnig-straßengel-plankenwartherstraße',
-#    'https://www.dasschnelle.at/oä-dr-waltraud-stromer-horn-ing-karl-proksch-gasse',
-#    'https://www.dasschnelle.at/dr-peter-vlasak-3-cz-studanky-cz-studanky',
-#    'https://www.dasschnelle.at/carta-büro-u-kopiertechnik-gmbh-sankt-johann-im-pongau-hauptstraße',
-#    'https://www.dasschnelle.at/mag-katharina-höchtl-kronheim-ottensheim-hostauerstraße',
-#    'https://www.dasschnelle.at/raiffeisen-lagerhaus-lavanttal-reggenmbh-wolfsberg-tanglstraße',
-#    'https://www.dasschnelle.at/maschinenring-hollabrunn-horn-mold-mold',
-#    'https://www.dasschnelle.at/klingelbrunner-ernst-jun-baumgarten-am-tullnerfeld-hauptstraße',
-#    'https://www.dasschnelle.at/robert-köppel-fenster-türen-sonnenschutz-gmbh-gratwein-straßengel-murfeldstraße',
-#    'https://www.dasschnelle.at/innenbau-peschel-gmbh-groß-siegharts-reiterweg',
-#    'https://www.dasschnelle.at/aigner-optiker-gmbh-grieskirchen-oberer-stadtplatz',
-#    'https://www.dasschnelle.at/kräuterpfarrer-zentrum-verein-freunde-der-heilkräuter-karlstein-an-der-thaya-hauptstraße',
-#    'https://www.dasschnelle.at/georg-und-gabriele-stocker-ohg-kies-u-fertigbetonwerk-transport-neuhaus-redinger-straße',
-#    'https://www.dasschnelle.at/pfeiler-s-flug-reisen-gmbh-simbach-innstraße',
-#    'https://www.dasschnelle.at/tischberger-christian-dr-laussa-kirchenplatz',
-#    'https://www.dasschnelle.at/marker-erich-gesmbh-und-co-kg-pottenstein-bundesstraße',
-#    'https://www.dasschnelle.at/gasthof-pension-göttler-simbach-pfarrkirchner-straße',
-#    'https://www.dasschnelle.at/dr-bernhard-distlbacher-gmünd-stadtplatz',
-#    'https://www.dasschnelle.at/zirngast-kfz-ges-m-b-h-nfg-kg-leibnitz-grazer-straße',
-#    'https://www.dasschnelle.at/robert-pomberger-mariazell-friedhofgasse',
-#    'https://www.dasschnelle.at/notariat-schärding-schärding-innere-stadt-innbruckstraße',
-#    'https://www.dasschnelle.at/riedl-bau-marchtrenk-nelkenstraße',
-#    'https://www.dasschnelle.at/volkshochschule-baden-baden-johannesgasse',
-#    'https://www.dasschnelle.at/zirngast-kfz-gmbh-nfg-keg-neutillmitsch-grazerstrasse',
-#    'https://www.dasschnelle.at/malermeister-pils-gmbh-freistadt-schützengasse'
