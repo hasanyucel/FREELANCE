@@ -1,4 +1,4 @@
-import cloudscraper,pandas,time,sqlite3,json
+import cloudscraper,time,sqlite3,json,pandas as pd
 from rich import print
 from bs4 import BeautifulSoup
 from bs2json import bs2json
@@ -174,6 +174,12 @@ def getIdentityDetails(link):
     #print('images : ',images)
     print('priceRange : ',priceRange)
 
+def makeHyperlink(url):
+    return f'=Hyperlink("{url}","Website")'
+
+def makeLocationHyperlink(lat,lon):
+    return f'=Hyperlink("http://www.google.com/maps/place/{lat},{lon}","Location")'
+
 print("Script is working...")
 t0 = time.time()
 #createDbAndTables()
@@ -203,6 +209,22 @@ t0 = time.time()
 
 #for link in error_links:
 #    getIdentityDetails(link) #https://www.dasschnelle.at/blumen-egerth-exenberger-renate-kufstein-gewerbehof
+
+
+def importDatas():
+    conn = sqlite3.connect(db)
+    df = pd.read_sql_query("SELECT * from Identities", conn)
+    df = pd.DataFrame(df)
+    df['link'] = df.apply(lambda row : makeHyperlink(row['link']), axis = 1)
+    df['urls'] = df.apply(lambda row : makeHyperlink(row['urls']), axis = 1)
+    df['Location'] = df.apply(lambda row : makeLocationHyperlink(row['latitude'],row['longitude']), axis = 1)
+    print(df)
+    writer = pd.ExcelWriter('dasschnelle.xlsx')
+    df.to_excel(writer,sheet_name ='Veriler')
+    writer.save()
+    conn.close()
+
+importDatas()
 
 t1 = time.time()
 print(f"{t1-t0} seconds.")
