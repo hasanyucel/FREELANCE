@@ -1,8 +1,10 @@
 from fastapi import FastAPI,HTTPException
+from custom_logger import CustomLoggerMiddleware
 import sqlite3
 
 db_file = "kuran_database.db"
 app = FastAPI()
+app.add_middleware(CustomLoggerMiddleware)
 
 diller_db = {
     "Almanca (Abu Rida)": "de_aburida",
@@ -52,7 +54,6 @@ def diller():
 @app.get("/sureler")
 def sureler():
     sureler = get_sureler()
-    print(sureler)
     return sureler
 
 @app.get("/get_ayet/{dil}/{sure}/{ayet}")
