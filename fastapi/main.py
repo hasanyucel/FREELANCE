@@ -25,12 +25,22 @@ def get_metin(dil, sure, ayet):
     conn.close()
     return text
 
+def get_sureler():
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM sureler')
+    rows = cur.fetchall()
+    conn.close()
+    sureler = [{"sure_no": row[0], "ayet_sayisi": row[1], "sure_ismi": row[2]} for row in rows]
+    return sureler
+
 @app.get("/")
 def bismillahirrahmanirrahim():
     result = {
                 "KuranAPI" : "Bismillahirrahmanirrahim!",
                 "Api Dokümanı" : "/docs",
                 "Diller": "/diller",
+                "Sureler": "/sureler",
                 "Kaynaklar":["https://tanzil.net","https://www.ubilisim.com"]
              }
     return result
@@ -38,6 +48,12 @@ def bismillahirrahmanirrahim():
 @app.get("/diller")
 def diller():
     return diller_db 
+
+@app.get("/sureler")
+def sureler():
+    sureler = get_sureler()
+    print(sureler)
+    return sureler
 
 @app.get("/get_ayet/{dil}/{sure}/{ayet}")
 def get_ayet(dil: str, sure: int, ayet: int):
