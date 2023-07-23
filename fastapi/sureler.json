@@ -1,0 +1,574 @@
+{
+  "sureler": [
+    {
+      "sure_adi": "Fatiha",
+      "sure_numarasi": 1,
+      "ayet_sayisi": 7
+    },
+    {
+      "sure_adi": "Bakara",
+      "sure_numarasi": 2,
+      "ayet_sayisi": 286
+    },
+    {
+      "sure_adi": "Al-i Imran",
+      "sure_numarasi": 3,
+      "ayet_sayisi": 200
+    },
+    {
+      "sure_adi": "Nisa",
+      "sure_numarasi": 4,
+      "ayet_sayisi": 176
+    },
+    {
+      "sure_adi": "Maide",
+      "sure_numarasi": 5,
+      "ayet_sayisi": 120
+    },
+    {
+      "sure_adi": "Enam",
+      "sure_numarasi": 6,
+      "ayet_sayisi": 165
+    },
+    {
+      "sure_adi": "Araf",
+      "sure_numarasi": 7,
+      "ayet_sayisi": 206
+    },
+    {
+      "sure_adi": "Enfal",
+      "sure_numarasi": 8,
+      "ayet_sayisi": 75
+    },
+    {
+      "sure_adi": "Tevbe",
+      "sure_numarasi": 9,
+      "ayet_sayisi": 129
+    },
+    {
+      "sure_adi": "Yunus",
+      "sure_numarasi": 10,
+      "ayet_sayisi": 109
+    },
+    {
+      "sure_adi": "Hud",
+      "sure_numarasi": 11,
+      "ayet_sayisi": 123
+    },
+    {
+      "sure_adi": "Yusuf",
+      "sure_numarasi": 12,
+      "ayet_sayisi": 111
+    },
+    {
+      "sure_adi": "Rad",
+      "sure_numarasi": 13,
+      "ayet_sayisi": 43
+    },
+    {
+      "sure_adi": "Ibrahim",
+      "sure_numarasi": 14,
+      "ayet_sayisi": 52
+    },
+    {
+      "sure_adi": "Hicr",
+      "sure_numarasi": 15,
+      "ayet_sayisi": 99
+    },
+    {
+      "sure_adi": "Nahl",
+      "sure_numarasi": 16,
+      "ayet_sayisi": 128
+    },
+    {
+      "sure_adi": "Isra",
+      "sure_numarasi": 17,
+      "ayet_sayisi": 111
+    },
+    {
+      "sure_adi": "Kehf",
+      "sure_numarasi": 18,
+      "ayet_sayisi": 110
+    },
+    {
+      "sure_adi": "Meryem",
+      "sure_numarasi": 19,
+      "ayet_sayisi": 98
+    },
+    {
+      "sure_adi": "Taha",
+      "sure_numarasi": 20,
+      "ayet_sayisi": 135
+    },
+    {
+      "sure_adi": "Enbiya",
+      "sure_numarasi": 21,
+      "ayet_sayisi": 112
+    },
+    {
+      "sure_adi": "Hac",
+      "sure_numarasi": 22,
+      "ayet_sayisi": 78
+    },
+    {
+      "sure_adi": "Muminun",
+      "sure_numarasi": 23,
+      "ayet_sayisi": 118
+    },
+    {
+      "sure_adi": "Nur",
+      "sure_numarasi": 24,
+      "ayet_sayisi": 64
+    },
+    {
+      "sure_adi": "Furkan",
+      "sure_numarasi": 25,
+      "ayet_sayisi": 77
+    },
+    {
+      "sure_adi": "Sura",
+      "sure_numarasi": 26,
+      "ayet_sayisi": 227
+    },
+    {
+      "sure_adi": "Neml",
+      "sure_numarasi": 27,
+      "ayet_sayisi": 93
+    },
+    {
+      "sure_adi": "Kasas",
+      "sure_numarasi": 28,
+      "ayet_sayisi": 88
+    },
+    {
+      "sure_adi": "Ankebut",
+      "sure_numarasi": 29,
+      "ayet_sayisi": 69
+    },
+    {
+      "sure_adi": "Rum",
+      "sure_numarasi": 30,
+      "ayet_sayisi": 60
+    },
+    {
+      "sure_adi": "Lokman",
+      "sure_numarasi": 31,
+      "ayet_sayisi": 34
+    },
+    {
+      "sure_adi": "Secde",
+      "sure_numarasi": 32,
+      "ayet_sayisi": 30
+    },
+    {
+      "sure_adi": "Ahzab",
+      "sure_numarasi": 33,
+      "ayet_sayisi": 73
+    },
+    {
+      "sure_adi": "Sebe",
+      "sure_numarasi": 34,
+      "ayet_sayisi": 54
+    },
+    {
+      "sure_adi": "Fatir",
+      "sure_numarasi": 35,
+      "ayet_sayisi": 45
+    },
+    {
+      "sure_adi": "Yasin",
+      "sure_numarasi": 36,
+      "ayet_sayisi": 83
+    },
+    {
+      "sure_adi": "Saffat",
+      "sure_numarasi": 37,
+      "ayet_sayisi": 182
+    },
+    {
+      "sure_adi": "Sad",
+      "sure_numarasi": 38,
+      "ayet_sayisi": 88
+    },
+    {
+      "sure_adi": "Zumer",
+      "sure_numarasi": 39,
+      "ayet_sayisi": 75
+    },
+    {
+      "sure_adi": "Mumin",
+      "sure_numarasi": 40,
+      "ayet_sayisi": 85
+    },
+    {
+      "sure_adi": "Fussilet",
+      "sure_numarasi": 41,
+      "ayet_sayisi": 54
+    },
+    {
+      "sure_adi": "Sura",
+      "sure_numarasi": 42,
+      "ayet_sayisi": 53
+    },
+    {
+      "sure_adi": "Zuhruf",
+      "sure_numarasi": 43,
+      "ayet_sayisi": 89
+    },
+    {
+      "sure_adi": "Duhana",
+      "sure_numarasi": 44,
+      "ayet_sayisi": 59
+    },
+    {
+      "sure_adi": "Casas",
+      "sure_numarasi": 45,
+      "ayet_sayisi": 37
+    },
+    {
+      "sure_adi": "Ahkaf",
+      "sure_numarasi": 46,
+      "ayet_sayisi": 35
+    },
+    {
+      "sure_adi": "Muhammed",
+      "sure_numarasi": 47,
+      "ayet_sayisi": 38
+    },
+    {
+      "sure_adi": "Fetih",
+      "sure_numarasi": 48,
+      "ayet_sayisi": 29
+    },
+    {
+      "sure_adi": "Hucurat",
+      "sure_numarasi": 49,
+      "ayet_sayisi": 18
+    },
+    {
+      "sure_adi": "Kaf",
+      "sure_numarasi": 50,
+      "ayet_sayisi": 45
+    },
+    {
+      "sure_adi": "Zariyat",
+      "sure_numarasi": 51,
+      "ayet_sayisi": 60
+    },
+    {
+      "sure_adi": "Tur",
+      "sure_numarasi": 52,
+      "ayet_sayisi": 49
+    },
+    {
+      "sure_adi": "Necm",
+      "sure_numarasi": 53,
+      "ayet_sayisi": 62
+    },
+    {
+      "sure_adi": "Kamer",
+      "sure_numarasi": 54,
+      "ayet_sayisi": 55
+    },
+    {
+      "sure_adi": "Rahman",
+      "sure_numarasi": 55,
+      "ayet_sayisi": 78
+    },
+    {
+      "sure_adi": "Vakia",
+      "sure_numarasi": 56,
+      "ayet_sayisi": 96
+    },
+    {
+      "sure_adi": "Hadid",
+      "sure_numarasi": 57,
+      "ayet_sayisi": 29
+    },
+    {
+      "sure_adi": "Mucadele",
+      "sure_numarasi": 58,
+      "ayet_sayisi": 22
+    },
+    {
+      "sure_adi": "Hasr",
+      "sure_numarasi": 59,
+      "ayet_sayisi": 24
+    },
+    {
+      "sure_adi": "Mumtehine",
+      "sure_numarasi": 60,
+      "ayet_sayisi": 13
+    },
+    {
+      "sure_adi": "Saff",
+      "sure_numarasi": 61,
+      "ayet_sayisi": 14
+    },
+    {
+      "sure_adi": "Cuma",
+      "sure_numarasi": 62,
+      "ayet_sayisi": 11
+    },
+    {
+      "sure_adi": "Munafikun",
+      "sure_numarasi": 63,
+      "ayet_sayisi": 11
+    },
+    {
+      "sure_adi": "Tegabun",
+      "sure_numarasi": 64,
+      "ayet_sayisi": 18
+    },
+    {
+      "sure_adi": "Talak",
+      "sure_numarasi": 65,
+      "ayet_sayisi": 12
+    },
+    {
+      "sure_adi": "Tahrim",
+      "sure_numarasi": 66,
+      "ayet_sayisi": 12
+    },
+    {
+      "sure_adi": "Mulk",
+      "sure_numarasi": 67,
+      "ayet_sayisi": 30
+    },
+    {
+      "sure_adi": "Kalem",
+      "sure_numarasi": 68,
+      "ayet_sayisi": 52
+    },
+    {
+      "sure_adi": "Hakka",
+      "sure_numarasi": 69,
+      "ayet_sayisi": 52
+    },
+    {
+      "sure_adi": "Me'aric",
+      "sure_numarasi": 70,
+      "ayet_sayisi": 44
+    },
+    {
+      "sure_adi": "Nuh",
+      "sure_numarasi": 71,
+      "ayet_sayisi": 28
+    },
+    {
+      "sure_adi": "Cin",
+      "sure_numarasi": 72,
+      "ayet_sayisi": 28
+    },
+    {
+      "sure_adi": "Muzzemmil",
+      "sure_numarasi": 73,
+      "ayet_sayisi": 20
+    },
+    {
+      "sure_adi": "Muddessir",
+      "sure_numarasi": 74,
+      "ayet_sayisi": 56
+    },
+    {
+      "sure_adi": "Kiyamet",
+      "sure_numarasi": 75,
+      "ayet_sayisi": 40
+    },
+    {
+      "sure_adi": "Insan",
+      "sure_numarasi": 76,
+      "ayet_sayisi": 31
+    },
+    {
+      "sure_adi": "Murselat",
+      "sure_numarasi": 77,
+      "ayet_sayisi": 50
+    },
+    {
+      "sure_adi": "Nebe",
+      "sure_numarasi": 78,
+      "ayet_sayisi": 40
+    },
+    {
+      "sure_adi": "Naziat",
+      "sure_numarasi": 79,
+      "ayet_sayisi": 46
+    },
+    {
+      "sure_adi": "Abese",
+      "sure_numarasi": 80,
+      "ayet_sayisi": 42
+    },
+    {
+      "sure_adi": "Tekvir",
+      "sure_numarasi": 81,
+      "ayet_sayisi": 29
+    },
+    {
+      "sure_adi": "Infitar",
+      "sure_numarasi": 82,
+      "ayet_sayisi": 19
+    },
+    {
+      "sure_adi": "Mutaffifin",
+      "sure_numarasi": 83,
+      "ayet_sayisi": 36
+    },
+    {
+      "sure_adi": "Insisak",
+      "sure_numarasi": 84,
+      "ayet_sayisi": 25
+    },
+    {
+      "sure_adi": "Buruc",
+      "sure_numarasi": 85,
+      "ayet_sayisi": 22
+    },
+    {
+      "sure_adi": "Tarik",
+      "sure_numarasi": 86,
+      "ayet_sayisi": 17
+    },
+    {
+      "sure_adi": "Ala",
+      "sure_numarasi": 87,
+      "ayet_sayisi": 19
+    },
+    {
+      "sure_adi": "Gasiye",
+      "sure_numarasi": 88,
+      "ayet_sayisi": 26
+    },
+    {
+      "sure_adi": "Fecr",
+      "sure_numarasi": 89,
+      "ayet_sayisi": 30
+    },
+    {
+      "sure_adi": "Beled",
+      "sure_numarasi": 90,
+      "ayet_sayisi": 20
+    },
+    {
+      "sure_adi": "Sems",
+      "sure_numarasi": 91,
+      "ayet_sayisi": 15
+    },
+    {
+      "sure_adi": "Leyl",
+      "sure_numarasi": 92,
+      "ayet_sayisi": 21
+    },
+    {
+      "sure_adi": "Duha",
+      "sure_numarasi": 93,
+      "ayet_sayisi": 11
+    },
+    {
+      "sure_adi": "Inşirah",
+      "sure_numarasi": 94,
+      "ayet_sayisi": 8
+    },
+    {
+      "sure_adi": "Tin",
+      "sure_numarasi": 95,
+      "ayet_sayisi": 8
+    },
+    {
+      "sure_adi": "Alak",
+      "sure_numarasi": 96,
+      "ayet_sayisi": 19
+    },
+    {
+      "sure_adi": "Kadir",
+      "sure_numarasi": 97,
+      "ayet_sayisi": 5
+    },
+    {
+      "sure_adi": "Beyyine",
+      "sure_numarasi": 98,
+      "ayet_sayisi": 8
+    },
+    {
+      "sure_adi": "Zilzal",
+      "sure_numarasi": 99,
+      "ayet_sayisi": 8
+    },
+    {
+      "sure_adi": "Adiyat",
+      "sure_numarasi": 100,
+      "ayet_sayisi": 11
+    },
+    {
+      "sure_adi": "Karia",
+      "sure_numarasi": 101,
+      "ayet_sayisi": 11
+    },
+    {
+      "sure_adi": "Tekasur",
+      "sure_numarasi": 102,
+      "ayet_sayisi": 8
+    },
+    {
+      "sure_adi": "Asr",
+      "sure_numarasi": 103,
+      "ayet_sayisi": 3
+    },
+    {
+      "sure_adi": "Humeze",
+      "sure_numarasi": 104,
+      "ayet_sayisi": 9
+    },
+    {
+      "sure_adi": "Fil",
+      "sure_numarasi": 105,
+      "ayet_sayisi": 5
+    },
+    {
+      "sure_adi": "Kureys",
+      "sure_numarasi": 106,
+      "ayet_sayisi": 4
+    },
+    {
+      "sure_adi": "Ma'un",
+      "sure_numarasi": 107,
+      "ayet_sayisi": 7
+    },
+    {
+      "sure_adi": "Kevser",
+      "sure_numarasi": 108,
+      "ayet_sayisi": 3
+    },
+    {
+      "sure_adi": "Kafirun",
+      "sure_numarasi": 109,
+      "ayet_sayisi": 6
+    },
+    {
+      "sure_adi": "Nasr",
+      "sure_numarasi": 110,
+      "ayet_sayisi": 3
+    },
+    {
+      "sure_adi": "Tebbet",
+      "sure_numarasi": 111,
+      "ayet_sayisi": 5
+    },
+    {
+      "sure_adi": "Ihlas",
+      "sure_numarasi": 112,
+      "ayet_sayisi": 4
+    },
+    {
+      "sure_adi": "Felak",
+      "sure_numarasi": 113,
+      "ayet_sayisi": 5
+    },
+    {
+      "sure_adi": "Nas",
+      "sure_numarasi": 114,
+      "ayet_sayisi": 6
+    }
+  ]
+}

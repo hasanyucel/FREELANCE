@@ -1,28 +1,59 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
+import sqlite3
 
+db_file = "kuran_database.db"
 app = FastAPI()
+
+diller_db = {
+    "Almanca (Abu Rida)": "de_aburida",
+    "İngilizce (Yusuf Ali)": "en_yusufali",
+    "Fransızca (Hamidullah)": "fr_hamidullah",
+    "İtalyanca (Piccardo)": "it_piccardo",
+    "Japonca": "ja_japanese",
+    "KU (Asan)": "ku_asan",
+    "Orjinal Arapça": "quran_text",
+    "Rusça (Muntahab)": "ru_muntahab",
+    "Türkçe (Diyanet)": "tr_diyanet",
+    "Özbekçe (Sodik)": "uz_sodik"
+}
+
+def get_metin(dil, sure, ayet):
+    conn = sqlite3.connect(db_file)
+    cur = conn.cursor()
+    cur.execute(f'SELECT text FROM {dil} where sura = {sure} and aya = {ayet}')
+    text = cur.fetchone()
+    conn.close()
+    return text
 
 @app.get("/")
 def bismillahirrahmanirrahim():
     result = {
                 "KuranAPI" : "Bismillahirrahmanirrahim!",
                 "Api Dokümanı" : "/docs",
-                "Diller": "/languages"
+                "Diller": "/diller",
+                "Kaynaklar":["https://tanzil.net","https://www.ubilisim.com"]
              }
     return result
 
-@app.get("/languages")
-def languages():
-    result = {
-                "Almanca (Abu Rida)":"de_aburida",
-                "İngilizce (Yusuf Ali)":"en_yusufali",
-                "Fransızca (Hamidullah)":"fr_hamidullah",
-                "İtalyanca (Piccardo)":"it_piccardo",
-                "Japonca":"ja_japanese",
-                "KU (Asan)":"ku_asan",
-                "Orjinal Arapça":"quran_text",
-                "Rusça (Muntahab)":"ru_muntahab",
-                "Türkçe (Diyanet)":"tr_diyanet",
-                "Özbekçe (Sodik)":"uz_sodik"
-             }
-    return result 
+@app.get("/diller")
+def diller():
+    return diller_db 
+
+@app.get("/get_ayet/{dil}/{sure}/{ayet}")
+def get_ayet(dil: str, sure: int, ayet: int):
+    for lang_key, lang_value in diller_db.items():
+        if lang_value == dil:
+            text = get_metin(dil,sure,ayet)
+            if text:
+                metin = text[0]
+                result = {
+                    "Dil": lang_key,
+                    "Sure": sure,
+                    "Ayet": ayet,
+                    "Metin": text[0]
+                }
+                return result
+            else:
+                raise HTTPException(status_code=404, detail="Sure veya ayet bulunamadı!")
+            
+    raise HTTPException(status_code=404, detail="Dil bulunamadı!")
